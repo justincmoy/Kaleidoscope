@@ -61,14 +61,14 @@ enum {
 KEYMAPS(
   [QWERTY] = KEYMAP_STACKED
   (
-       Key_Q   ,Key_W   ,Key_E       ,Key_R         ,Key_T
-      ,Key_A   ,Key_S   ,Key_D       ,Key_F         ,Key_G
-      ,Key_Z   ,Key_X   ,Key_C       ,Key_V         ,Key_B, Key_Backtick
+       Key_Q   ,Key_W   ,Key_F       ,Key_R         ,Key_J
+      ,Key_A   ,Key_T   ,Key_H       ,Key_E         ,Key_G
+      ,Key_Z   ,Key_X   ,Key_D       ,Key_V         ,Key_B, Key_Backtick
       ,Key_CapsLock ,Key_Tab ,Key_LeftGui ,Key_LeftShift ,Key_Space ,Key_LeftControl
 
-                     ,Key_Y     ,Key_U      ,Key_I     ,Key_O      ,Key_P
-                     ,Key_H     ,Key_J      ,Key_K     ,Key_L      ,Key_Semicolon
-       ,Key_Backslash,Key_N     ,Key_M      ,Key_Comma ,Key_Period ,Key_Slash
+                     ,Key_Y     ,Key_U      ,Key_Semicolon     ,Key_L      ,Key_P
+                     ,Key_C     ,Key_S      ,Key_N     ,Key_O      ,Key_I
+       ,Key_Backslash,Key_K     ,Key_M      ,Key_Comma ,Key_Period ,Key_Slash
        ,Key_LeftAlt  ,Key_Backspace ,MO(FUN)    ,Key_Minus ,Key_Quote  ,Key_Enter
   ),
 
