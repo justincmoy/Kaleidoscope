@@ -69,7 +69,7 @@ KEYMAPS(
                      ,Key_Y     ,Key_U      ,Key_Semicolon     ,Key_L      ,Key_P
                      ,Key_C     ,Key_S      ,Key_N     ,Key_O      ,Key_I
        ,Key_Backslash,Key_K     ,Key_M      ,Key_Comma ,Key_Period ,Key_Slash
-       ,Key_LeftShift  ,Key_Backspace ,MO(FUN)    ,Key_Minus ,Key_Quote  ,Key_Enter
+       ,Key_LeftShift  ,Key_Backspace ,MO(FUN)    ,Key_Minus ,Key_RightAlt  ,Key_Enter
   ),
 
   [FUN] = KEYMAP_STACKED
@@ -80,7 +80,7 @@ KEYMAPS(
       ,TG(UPPER)       ,Key_Insert       ,Key_LeftGui   ,Key_LeftAlt        ,Key_Space         ,Key_LeftControl
 
                    ,Key_PageUp   ,Key_7 ,Key_8      ,Key_9 ,Key_Backspace
-                   ,Key_PageDown ,Key_4 ,Key_5      ,Key_6 ,___
+                   ,Key_PageDown ,Key_4 ,Key_5      ,Key_6 ,Key_Quote
       ,Key_And     ,Key_Star     ,Key_1 ,Key_2      ,Key_3 ,Key_Plus
       ,Key_LeftShift ,Key_Delete    ,___   ,Key_Period ,Key_0 ,Key_Equals
    ),
