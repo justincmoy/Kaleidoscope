@@ -52,6 +52,7 @@ enum {
 #define Key_Plus LSHIFT(Key_Equals)
 
 enum {
+  NOLMTS,
   QWERTY,
   FUN,
   UPPER
@@ -59,17 +60,30 @@ enum {
 
 /* *INDENT-OFF* */
 KEYMAPS(
-  [QWERTY] = KEYMAP_STACKED
+  [NOLMTS] = KEYMAP_STACKED
   (
        Key_Q   ,Key_W   ,Key_F       ,Key_R         ,Key_J
       ,Key_A   ,Key_T   ,Key_H       ,Key_E         ,Key_G
       ,Key_Z   ,Key_X   ,Key_D       ,Key_V         ,Key_B, Key_Backtick
-      ,Key_CapsLock ,Key_Tab ,Key_LeftGui ,Key_LeftAlt ,Key_Space ,Key_LeftControl
+      ,Key_Escape ,Key_Tab ,Key_LeftGui ,MO(FUN) ,Key_Space ,Key_LeftControl
 
                      ,Key_Y     ,Key_U      ,Key_Semicolon     ,Key_L      ,Key_P
                      ,Key_C     ,Key_S      ,Key_N     ,Key_O      ,Key_I
        ,Key_Backslash,Key_K     ,Key_M      ,Key_Comma ,Key_Period ,Key_Slash
-       ,Key_LeftShift  ,Key_Backspace ,MO(FUN)    ,Key_Minus ,Key_RightAlt  ,Key_Enter
+       ,Key_LeftAlt  ,Key_Backspace ,Key_LeftShift    ,Key_Minus ,Key_RightAlt  ,Key_Enter
+  ),
+
+  [QWERTY] = KEYMAP_STACKED
+  (
+       Key_Q   ,Key_W   ,Key_E       ,Key_R         ,Key_T
+      ,Key_A   ,Key_S   ,Key_D       ,Key_F         ,Key_G
+      ,Key_Z   ,Key_X   ,Key_C       ,Key_V         ,Key_B, Key_Backtick
+      ,Key_Escape ,Key_Tab ,Key_LeftGui ,MO(FUN) ,Key_Space ,Key_LeftControl
+
+                     ,Key_Y     ,Key_U      ,Key_I     ,Key_O      ,Key_P
+                     ,Key_H     ,Key_J      ,Key_K     ,Key_L      ,Key_Semicolon
+       ,Key_Backslash,Key_N     ,Key_M      ,Key_Comma ,Key_Period ,Key_Slash
+       ,Key_LeftAlt  ,Key_Backspace ,Key_LeftShift    ,Key_Minus ,Key_RightAlt  ,Key_Enter
   ),
 
   [FUN] = KEYMAP_STACKED
@@ -77,7 +91,7 @@ KEYMAPS(
        Key_Exclamation ,Key_At           ,Key_UpArrow   ,Key_Dollar           ,Key_Percent
       ,Key_LeftParen   ,Key_LeftArrow    ,Key_DownArrow ,Key_RightArrow       ,Key_RightParen
       ,Key_LeftBracket ,Key_RightBracket ,Key_Hash      ,Key_LeftCurlyBracket ,Key_RightCurlyBracket ,Key_Caret
-      ,TG(UPPER)       ,Key_Insert       ,Key_LeftGui   ,Key_LeftAlt        ,Key_Space         ,Key_LeftControl
+      ,TG(UPPER)       ,Key_Insert       ,Key_LeftGui   ,MO(FUN)        ,Key_Space         ,Key_LeftControl
 
                    ,Key_PageUp   ,Key_7 ,Key_8      ,Key_9 ,Key_Backspace
                    ,Key_PageDown ,Key_4 ,Key_5      ,Key_6 ,Key_Quote
@@ -90,12 +104,12 @@ KEYMAPS(
        Key_Insert            ,Key_Home                 ,Key_UpArrow   ,Key_End        ,Key_PageUp
       ,Key_Delete            ,Key_LeftArrow            ,Key_DownArrow ,Key_RightArrow ,Key_PageDown
       ,M(MACRO_VERSION_INFO) ,Consumer_VolumeIncrement ,XXX           ,XXX            ,___ ,___
-      ,MoveToLayer(QWERTY)   ,Consumer_VolumeDecrement ,___           ,___            ,___ ,___
+      ,MoveToLayer(NOLMTS)   ,Consumer_VolumeDecrement ,___           ,MoveToLayer(QWERTY) ,___ ,___
 
                 ,Key_UpArrow   ,Key_F7              ,Key_F8          ,Key_F9         ,Key_F10
                 ,Key_DownArrow ,Key_F4              ,Key_F5          ,Key_F6         ,Key_F11
       ,___      ,XXX           ,Key_F1              ,Key_F2          ,Key_F3         ,Key_F12
-      ,___      ,___           ,MoveToLayer(QWERTY) ,Key_PrintScreen ,Key_ScrollLock ,Consumer_PlaySlashPause
+      ,___      ,___           ,___                 ,Key_PrintScreen ,Key_ScrollLock ,Consumer_PlaySlashPause
    )
 )
 /* *INDENT-ON* */
