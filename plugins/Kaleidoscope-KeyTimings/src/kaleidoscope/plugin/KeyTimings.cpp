@@ -15,8 +15,7 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Kaleidoscope-EEPROM-Settings.h>
-#include <Kaleidoscope-EEPROM-Keymap.h>
+#include <Kaleidoscope-KeyTimings.h>
 #include <Kaleidoscope-FocusSerial.h>
 #include "kaleidoscope/layers.h"
 
@@ -36,7 +35,7 @@ EventHandlerResult KeyTimings::onFocusEvent(const char *command) {
 
   if (strcmp_P(command + 11, PSTR("start")) == 0) {
     ::Focus.send(F("Key timing started!"));
-  } else if strcmp_P(command + 11, PSTR("stop")){
+  } else if (strcmp_P(command + 11, PSTR("stop")) == 0){
     ::Focus.send(F("Key timing stopped!"));
   }
 
