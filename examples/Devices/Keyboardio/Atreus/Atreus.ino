@@ -35,6 +35,7 @@
 
 #define MO(n) ShiftToLayer(n)
 #define TG(n) LockLayer(n)
+#define UN(n) UnlockLayer(n)
 
 enum {
   MACRO_QWERTY,
@@ -55,7 +56,8 @@ enum {
   NOLMTS,
   QWERTY,
   FUN,
-  UPPER
+  UPPER,
+  SHORTCUT
 };
 
 /* *INDENT-OFF* */
@@ -103,13 +105,26 @@ KEYMAPS(
   (
        Key_Insert            ,Key_Home                 ,Key_UpArrow   ,Key_End        ,Key_PageUp
       ,Key_Delete            ,Key_LeftArrow            ,Key_DownArrow ,Key_RightArrow ,Key_PageDown
-      ,M(MACRO_VERSION_INFO) ,Consumer_VolumeIncrement ,XXX           ,XXX            ,___ ,___
+      ,M(MACRO_VERSION_INFO) ,Consumer_VolumeIncrement ,XXX           ,XXX            ,___ ,TG(SHORTCUT)
       ,MoveToLayer(NOLMTS)   ,Consumer_VolumeDecrement ,___           ,MoveToLayer(QWERTY) ,___ ,___
 
                 ,Key_UpArrow   ,Key_F7              ,Key_F8          ,Key_F9         ,Key_F10
                 ,Key_DownArrow ,Key_F4              ,Key_F5          ,Key_F6         ,Key_F11
       ,___      ,XXX           ,Key_F1              ,Key_F2          ,Key_F3         ,Key_F12
       ,___      ,___           ,___                 ,Key_PrintScreen ,Key_ScrollLock ,Consumer_PlaySlashPause
+   ),
+
+  [SHORTCUT] = KEYMAP_STACKED
+  (
+       ___ ,___ ,___ ,___ ,___
+      ,___ ,___ ,___ ,___ ,___
+      ,Key_Z ,Key_X ,___ ,___ ,Key_B ,UN(SHORTCUT)
+      ,___ ,___ ,___ ,___ ,___ ,___
+
+      ,___ ,___ ,___ ,___ ,___
+      ,Key_H     ,Key_J      ,Key_K     ,Key_L      ,___
+      ,___ ,___ ,___ ,___ ,___ ,___
+      ,LCTRL(LSHIFT(Key_N)) ,___ ,___ ,___ ,___ ,Key_Enter
    )
 )
 /* *INDENT-ON* */
