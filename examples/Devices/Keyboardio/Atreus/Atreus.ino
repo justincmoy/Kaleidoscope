@@ -25,6 +25,8 @@
 #include "Kaleidoscope-EEPROM-Settings.h"
 #include "Kaleidoscope-EEPROM-Keymap.h"
 #include "Kaleidoscope-FocusSerial.h"
+#include "Kaleidoscope-KeyTimings.h"
+//#include "Kaleidoscope-CycleTimeReport.h"
 #include "Kaleidoscope-Macros.h"
 #include "Kaleidoscope-MouseKeys.h"
 #include "Kaleidoscope-OneShot.h"
@@ -136,6 +138,9 @@ KALEIDOSCOPE_INIT_PLUGINS(
   FocusEEPROMCommand,
   FocusSettingsCommand,
   Qukeys,
+  KeyTimings,
+  //CycleTimeReport,
+  OneShot,
   SpaceCadet,
   OneShot,
   Macros,
