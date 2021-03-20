@@ -72,7 +72,7 @@ KEYMAPS(
                      ,Key_Y     ,Key_U      ,Key_Semicolon     ,Key_L      ,Key_P
                      ,Key_C     ,Key_S      ,Key_N     ,Key_O      ,Key_I
        ,Key_Backslash,Key_K     ,Key_M      ,Key_Comma ,Key_Period ,Key_Slash
-       ,Key_LeftAlt  ,Key_Backspace ,Key_LeftShift    ,Key_Minus ,Key_RightAlt  ,Key_Enter
+       ,Key_LeftAlt  ,Key_LeftShift    ,Key_Backspace ,Key_Minus ,Key_RightAlt  ,Key_Enter
   ),
 
   [QWERTY] = KEYMAP_STACKED
@@ -85,7 +85,7 @@ KEYMAPS(
                      ,Key_Y     ,Key_U      ,Key_I     ,Key_O      ,Key_P
                      ,Key_H     ,Key_J      ,Key_K     ,Key_L      ,Key_Semicolon
        ,Key_Backslash,Key_N     ,Key_M      ,Key_Comma ,Key_Period ,Key_Slash
-       ,Key_LeftAlt  ,Key_Backspace ,Key_LeftShift    ,Key_Minus ,Key_RightAlt  ,Key_Enter
+       ,Key_LeftAlt  ,Key_LeftShift    ,Key_Backspace ,Key_Minus ,Key_RightAlt  ,Key_Enter
   ),
 
   [FUN] = KEYMAP_STACKED
@@ -98,7 +98,7 @@ KEYMAPS(
                    ,Key_PageUp   ,Key_7 ,Key_8      ,Key_9 ,Key_Backspace
                    ,Key_PageDown ,Key_4 ,Key_5      ,Key_6 ,Key_Quote
       ,Key_And     ,Key_Star     ,Key_1 ,Key_2      ,Key_3 ,Key_Plus
-      ,Key_LeftShift ,Key_Delete    ,___   ,Key_Period ,Key_0 ,Key_Equals
+      ,Key_LeftAlt  ,Key_LeftShift    ,Key_Delete ,Key_Period ,Key_0  ,Key_Equals
    ),
 
   [UPPER] = KEYMAP_STACKED
