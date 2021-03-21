@@ -28,6 +28,7 @@ class KeyTimings : public kaleidoscope::Plugin {
 
   EventHandlerResult onSetup();
   EventHandlerResult onFocusEvent(const char *command);
+  EventHandlerResult onKeyswitchEvent(Key &, KeyAddr, uint8_t);
 
   /*static void setup(uint8_t max);
 

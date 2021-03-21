@@ -17,10 +17,15 @@
 
 #include <Kaleidoscope-KeyTimings.h>
 #include <Kaleidoscope-FocusSerial.h>
-#include "kaleidoscope/layers.h"
+#include "kaleidoscope/keyswitch_state.h"
+#include "kaleidoscope/Runtime.h"
 
 namespace kaleidoscope {
 namespace plugin {
+
+static uint32_t last_time;
+static bool last_down;
+static bool tracking;
 
 EventHandlerResult KeyTimings::onSetup() {
   return EventHandlerResult::OK;
@@ -35,11 +40,39 @@ EventHandlerResult KeyTimings::onFocusEvent(const char *command) {
 
   if (strcmp_P(command + 11, PSTR("start")) == 0) {
     ::Focus.send(F("Key timing started!"));
+    tracking = 1;
   } else if (strcmp_P(command + 11, PSTR("stop")) == 0){
     ::Focus.send(F("Key timing stopped!"));
+    tracking = 0;
   }
 
   return EventHandlerResult::EVENT_CONSUMED;
+}
+
+EventHandlerResult KeyTimings::onKeyswitchEvent(Key &mapped_key, KeyAddr key_addr, uint8_t key_state) {
+  uint32_t now = Runtime.millisAtCycleStart();
+
+  if(!tracking)
+    return EventHandlerResult::OK;
+
+  if (keyToggledOn(key_state)) {
+    ::Focus.send(now - last_time);
+    ::Focus.send(F("Key pressed")); 
+    ::Focus.send(mapped_key); 
+    if(last_down && now - last_time < 15)
+      ::Focus.send(F("chord")); 
+    ::Focus.send(F("\n")); 
+    last_time = now;
+    last_down = true;
+  }
+  else if (keyToggledOff(key_state)) {
+    ::Focus.send(now - last_time);
+    ::Focus.send(F("Key released\n"));
+    last_time = now;
+    last_down = false;
+  }
+
+  return EventHandlerResult::OK;
 }
 
 }

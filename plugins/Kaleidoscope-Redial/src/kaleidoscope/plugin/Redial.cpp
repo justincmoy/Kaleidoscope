@@ -25,7 +25,7 @@ Key Redial::key_to_redial_;
 Key Redial::last_key_;
 bool Redial::redial_held_ = false;
 
-EventHandlerResult Redial::onKeyswitchEvent(Key &mapped_key, KeyAddr key_addr, uint8_t key_state) {
+EventHandlerResult KeyTimings::onKeyswitchEvent(Key &mapped_key, KeyAddr key_addr, uint8_t key_state) {
   if (mapped_key == Key_Redial) {
     if (keyToggledOff(key_state))
       key_to_redial_ = last_key_;
