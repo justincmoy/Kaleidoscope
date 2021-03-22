@@ -173,8 +173,13 @@ EventHandlerResult Chords::onKeyswitchEvent(Key &mapped_key, KeyAddr key_addr, u
       return EventHandlerResult::OK;
     }
 
-    if(ongoing && (mapped_key == Key_C || mapped_key == Key_V))
+    // Pick on arbitrarily to pass through for chord still pressed; ignore the other.
+    if(ongoing && (mapped_key == Key_C))
       return EventHandlerResult::EVENT_CONSUMED;
+    if(ongoing && (mapped_key == Key_V)) {
+      mapped_key = Key_A;
+      return EventHandlerResult::OK;
+    }
     return EventHandlerResult::OK;
   }
 
