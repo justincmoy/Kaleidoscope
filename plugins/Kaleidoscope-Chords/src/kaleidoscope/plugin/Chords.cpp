@@ -33,7 +33,6 @@
 
 #include <Kaleidoscope-Chords.h>
 #include <Kaleidoscope-FocusSerial.h>
-#include "Kaleidoscope-Macros.h"
 #include "kaleidoscope/keyswitch_state.h"
 #include "kaleidoscope/Runtime.h"
 #include "kaleidoscope/device/key_indexes.h"
@@ -137,8 +136,8 @@ EventHandlerResult Chords::onKeyswitchEvent(Key &mapped_key, KeyAddr key_addr, u
     if (keys_pressed == 3) {
       ::Focus.send(F("Activating chord\n")); 
       state = ACTIVE;
-      Macros.play(MACRO(D(A)));
-      return EventHandlerResult::EVENT_CONSUMED;
+      mapped_key = Key_A;
+      return EventHandlerResult::OK;
     }
 
     // Handle timeout
@@ -163,15 +162,15 @@ EventHandlerResult Chords::onKeyswitchEvent(Key &mapped_key, KeyAddr key_addr, u
       keys_pressed &= ~1;
       state = keys_pressed ? DEACTIVATING : INACTIVE;
       ::Focus.send(F("Releasing chord (on C)\n")); 
-      Macros.play(MACRO(U(A)));
-      return EventHandlerResult::EVENT_CONSUMED;
+      mapped_key = Key_A;
+      return EventHandlerResult::OK;
     }
     if (keyToggledOff(key_state) && mapped_key == Key_V) {
       keys_pressed &= ~2;
       state = keys_pressed ? DEACTIVATING : INACTIVE;
       ::Focus.send(F("Releasing chord (on V)\n")); 
-      Macros.play(MACRO(U(A)));
-      return EventHandlerResult::EVENT_CONSUMED;
+      mapped_key = Key_A;
+      return EventHandlerResult::OK;
     }
 
     if(ongoing && (mapped_key == Key_C || mapped_key == Key_V))
