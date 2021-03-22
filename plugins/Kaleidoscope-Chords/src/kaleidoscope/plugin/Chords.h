@@ -43,11 +43,11 @@ class Chords : public kaleidoscope::Plugin {
 
  private:
   enum STATES {
-    INACTIVE,     // No keys pressed
-    ACTIVATING,   // One but not all keys pressed
-    ACTIVE,       // All keys pressed, chord is pressed
-    DEACTIVATING, // All keys were pressed, being released
-    DERAMPING     // Some keys were pressed, timed out, being released
+    INACTIVE,   // No keys pressed
+    PARTIAL,    // One but not all keys pressed
+    PRESSED,    // All keys pressed, chord is pressed
+    RELEASED,   // All keys were pressed, being released
+    ABORTED     // Some keys were pressed, timed out, being released
   };
 
   /*static uint16_t keymap_base_;

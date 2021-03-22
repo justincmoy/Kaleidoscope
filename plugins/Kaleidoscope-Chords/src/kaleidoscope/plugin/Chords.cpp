@@ -93,7 +93,7 @@ EventHandlerResult Chords::onKeyswitchEvent(Key &mapped_key, KeyAddr key_addr, u
   // If inactive and a relevant key was pressed, eat it and switch to activating.
   if (state == INACTIVE) {
     if (keys_pressed) {
-      state = ACTIVATING;
+      state = PARTIAL;
       ::Focus.send(F("Activating chord\n")); 
       return EventHandlerResult::EVENT_CONSUMED;
     }
@@ -107,12 +107,12 @@ EventHandlerResult Chords::onKeyswitchEvent(Key &mapped_key, KeyAddr key_addr, u
   // - If a relevant key was released, abort the chord
   // - If the timeout triggered, abort the chord
   // TODO: On deramping/deactivating, track re-presses to ensure chord is actually inactive when inactivated
-  if (state == ACTIVATING) {
+  if (state == PARTIAL) {
 
     // If all keys are pressed, activate the chord
     if (keys_pressed == 3) {
       ::Focus.send(F("Activating chord\n")); 
-      state = ACTIVE;
+      state = PRESSED;
       mapped_key = Key_LeftShift;
       return EventHandlerResult::OK;
     }
@@ -124,13 +124,13 @@ EventHandlerResult Chords::onKeyswitchEvent(Key &mapped_key, KeyAddr key_addr, u
         ::Focus.send(F("Pressing C on timeout\n")); 
       if(keys_pressed & 2)
         ::Focus.send(F("Pressing V on timeout\n")); 
-      state = DERAMPING;
+      state = ABORTED;
     }
 
     // Eat relevant key presses, and abort on relevant releases
     if (mapped_key == Key_C || mapped_key == Key_V) {
       if (keyToggledOff(key_state)) {
-        state = keys_pressed ? DERAMPING : INACTIVE;
+        state = keys_pressed ? ABORTED : INACTIVE;
         // TODO: Press the key before releasing it
         ::Focus.send(F("Aborting chord on key release\n")); 
       }
@@ -142,10 +142,10 @@ EventHandlerResult Chords::onKeyswitchEvent(Key &mapped_key, KeyAddr key_addr, u
   }
 
   // If a relevant key was released, release the chord and go to deactivating
-  if (state == ACTIVE) {
+  if (state == PRESSED) {
     // Check if a relevant key was released
     if (keyToggledOff(key_state) && keys_pressed != 3) {
-      state = keys_pressed ? DEACTIVATING : INACTIVE;
+      state = keys_pressed ? RELEASED : INACTIVE;
       ::Focus.send(F("Releasing chord\n")); 
       mapped_key = Key_LeftShift;
       return EventHandlerResult::OK;
@@ -162,7 +162,7 @@ EventHandlerResult Chords::onKeyswitchEvent(Key &mapped_key, KeyAddr key_addr, u
     return EventHandlerResult::OK;
   }
 
-  if (state == DEACTIVATING) {
+  if (state == RELEASED) {
     if(keys_pressed == 0)
       state = INACTIVE;
 
@@ -174,7 +174,7 @@ EventHandlerResult Chords::onKeyswitchEvent(Key &mapped_key, KeyAddr key_addr, u
     return EventHandlerResult::OK;
   }
 
-  if (state == DERAMPING) {
+  if (state == ABORTED) {
     // Check if chord is fully released
     if(keys_pressed == 0)
       state = INACTIVE;
