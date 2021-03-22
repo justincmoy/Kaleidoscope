@@ -136,7 +136,7 @@ EventHandlerResult Chords::onKeyswitchEvent(Key &mapped_key, KeyAddr key_addr, u
     if (keys_pressed == 3) {
       ::Focus.send(F("Activating chord\n")); 
       state = ACTIVE;
-      mapped_key = Key_A;
+      mapped_key = Key_LeftShift;
       return EventHandlerResult::OK;
     }
 
@@ -162,14 +162,14 @@ EventHandlerResult Chords::onKeyswitchEvent(Key &mapped_key, KeyAddr key_addr, u
       keys_pressed &= ~1;
       state = keys_pressed ? DEACTIVATING : INACTIVE;
       ::Focus.send(F("Releasing chord (on C)\n")); 
-      mapped_key = Key_A;
+      mapped_key = Key_LeftShift;
       return EventHandlerResult::OK;
     }
     if (keyToggledOff(key_state) && mapped_key == Key_V) {
       keys_pressed &= ~2;
       state = keys_pressed ? DEACTIVATING : INACTIVE;
       ::Focus.send(F("Releasing chord (on V)\n")); 
-      mapped_key = Key_A;
+      mapped_key = Key_LeftShift;
       return EventHandlerResult::OK;
     }
 
@@ -177,7 +177,7 @@ EventHandlerResult Chords::onKeyswitchEvent(Key &mapped_key, KeyAddr key_addr, u
     if(ongoing && (mapped_key == Key_C))
       return EventHandlerResult::EVENT_CONSUMED;
     if(ongoing && (mapped_key == Key_V)) {
-      mapped_key = Key_A;
+      mapped_key = Key_LeftShift;
       return EventHandlerResult::OK;
     }
     return EventHandlerResult::OK;
