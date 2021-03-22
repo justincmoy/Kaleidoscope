@@ -166,7 +166,7 @@ EventHandlerResult Chords::onKeyswitchEvent(Key &mapped_key, KeyAddr key_addr, u
     }
 
 
-    return EventHandlerResult::EVENT_CONSUMED;
+    return EventHandlerResult::OK;
   }
 
   // If a relevant key was released, release the chord and go to deactivating
