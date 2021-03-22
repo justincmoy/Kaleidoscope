@@ -16,8 +16,36 @@
  */
 
 /*
- * State diagram:
+ * States
  * 
+ * INACTIVE:
+ *   No keys in the chord are pressed.
+ *   - Pressing any key in the chord will change to PARTIAL
+ *
+ * PARTIAL:
+ *   One or more (but not all) keys in the chord are pressed.
+ *   The chord could be completed if all keys are pressed within the timeout.
+ *   - Pressing another key in the chord resets the timer
+ *   - Pressing the final key in the chord changes to PRESSED
+ *   - Releasing any key in the chord chord (ideally) presses all pressed keys and changes to ABORTED
+ *     - This is currently unimplemented, since it's basically impossible to do in the timeout
+ *   - Timing out (ideally) presses all pressed keys and changes to ABORTED
+ *     - Currently we just stop eating events, and that seems to work.
+ *
+ * PRESSED:
+ *   The chord has been fully pressed in the timeout, and they key down event for the chorded key is sent.
+ *   - Releasing any key in the chord releases the chorded key and changes to RELEASED
+ *
+ * RELEASED:
+ *   The chord was pressed, and has been released.
+ *   - Releasing any key in the chord will be eaten, since they were never pressed
+ *   - Releasing all keys in the chord changes to INACTIVE
+ *   - Pressing a key in the chord - currently unknown behavior.
+ *
+ * ABORTED:
+ *   The chord was aborted, either via releasing a key or timeout.
+ *   We pretend it never happened.
+ *   - Releasing all keys in the chord changes to INACTIVE.
  * * -- C -->  C --- V ---> chord down ---- any key up --> chord up --- all keys up --> *
  * ^           |
  * |          15 ms
