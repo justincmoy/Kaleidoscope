@@ -34,12 +34,21 @@ class Chords : public kaleidoscope::Plugin {
     uint8_t length;
     Key keys[5];
     Key action;
-    // Internal state
-    uint8_t state;
-    uint8_t pressed;
-    uint32_t last_time;
   } Chord;
 
+  typedef enum {
+    INACTIVE,   // No keys pressed
+    PARTIAL,    // One but not all keys pressed
+    PRESSED,    // All keys pressed, chord is pressed
+    RELEASED,   // All keys were pressed, being released
+    ABORTED     // Some keys were pressed, timed out, being released
+  } STATES;
+
+  typedef struct {
+    STATES state;
+    uint8_t pressed;
+    uint32_t last_time;
+  } ChordState;
   /*static void setup(uint8_t max);
 
   static void max_layers(uint8_t max);
@@ -52,13 +61,6 @@ class Chords : public kaleidoscope::Plugin {
   static void updateKey(uint16_t base_pos, Key key);*/
 
  private:
-  enum STATES {
-    INACTIVE,   // No keys pressed
-    PARTIAL,    // One but not all keys pressed
-    PRESSED,    // All keys pressed, chord is pressed
-    RELEASED,   // All keys were pressed, being released
-    ABORTED     // Some keys were pressed, timed out, being released
-  };
 
   /*static uint16_t keymap_base_;
   static uint8_t max_layers_;
