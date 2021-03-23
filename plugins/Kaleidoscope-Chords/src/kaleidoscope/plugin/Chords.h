@@ -30,6 +30,16 @@ class Chords : public kaleidoscope::Plugin {
   EventHandlerResult onFocusEvent(const char *command);
   EventHandlerResult onKeyswitchEvent(Key &, KeyAddr, uint8_t);
 
+  typedef struct {
+    uint8_t length;
+    Key keys[5];
+    Key action;
+    // Internal state
+    uint8_t state;
+    uint8_t pressed;
+    uint32_t last_time;
+  } Chord;
+
   /*static void setup(uint8_t max);
 
   static void max_layers(uint8_t max);

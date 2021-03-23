@@ -17,7 +17,7 @@
 
 /*
  * States
- * 
+ *
  * INACTIVE:
  *   No keys in the chord are pressed.
  *   - Pressing any key in the chord will change to PARTIAL
@@ -46,6 +46,8 @@
  *   The chord was aborted, either via releasing a key or timeout.
  *   We pretend it never happened.
  *   - Releasing all keys in the chord changes to INACTIVE.
+ *
+ *
  * * -- C -->  C --- V ---> chord down ---- any key up --> chord up --- all keys up --> *
  * ^           |
  * |          15 ms
@@ -57,7 +59,7 @@
  *
  *
  *
- */ 
+ */
 
 #include <Kaleidoscope-Chords.h>
 #include <Kaleidoscope-FocusSerial.h>
@@ -70,9 +72,11 @@
 namespace kaleidoscope {
 namespace plugin {
 
-static uint32_t last_time;
-static uint8_t state;
-
+Chords::Chord chord = {
+  .length = 2,
+  .keys = {Key_A, Key_S},
+  .action = Key_Tab
+};
 
 EventHandlerResult Chords::onSetup() {
   return EventHandlerResult::OK;
@@ -96,33 +100,33 @@ EventHandlerResult Chords::onFocusEvent(const char *command) {
   //return EventHandlerResult::EVENT_CONSUMED;
 }
 
-static uint8_t keys_pressed = 0;
-
 EventHandlerResult Chords::onKeyswitchEvent(Key &mapped_key, KeyAddr key_addr, uint8_t key_state) {
   uint32_t now = Runtime.millisAtCycleStart();
-
   bool ongoing = !keyToggledOn(key_state) && keyIsPressed(key_state);
+  int8_t chordKeyIndex = -1;
+  int i;
+
+  for (i = 0; i < chord.length; i++)
+    if (chord.keys[i] == mapped_key)
+      chordKeyIndex = i;
 
   // Check for keys pressed or released, and update state appropriately.
-  if (keyToggledOn(key_state) && mapped_key == Key_C) {
-    last_time = now;
-    keys_pressed |= 1;
+  if (chordKeyIndex != -1 && keyToggledOn(key_state)) {
+    chord.last_time = now;
+    chord.pressed |= (1 << chordKeyIndex);
   }
-  if (keyToggledOn(key_state) && mapped_key == Key_V) {
-    last_time = now;
-    keys_pressed |= 2;
+  if (chordKeyIndex != -1 && keyToggledOff(key_state)) {
+    chord.pressed &= ~(1 << chordKeyIndex);
+    ::Focus.send(F("Releasing key: <"));
+    ::Focus.send(chord.pressed);
+    ::Focus.send(F(">\n"));
   }
-
-  if (keyToggledOff(key_state) && mapped_key == Key_C)
-    keys_pressed &= ~1;
-  if (keyToggledOff(key_state) && mapped_key == Key_V)
-    keys_pressed &= ~2;
 
   // If inactive and a relevant key was pressed, eat it and switch to activating.
-  if (state == INACTIVE) {
-    if (keys_pressed) {
-      state = PARTIAL;
-      ::Focus.send(F("Activating chord\n")); 
+  if (chord.state == INACTIVE) {
+    if (chord.pressed) {
+      chord.state = PARTIAL;
+      ::Focus.send(F("Starting partial chord\n"));
       return EventHandlerResult::EVENT_CONSUMED;
     }
     return EventHandlerResult::OK;
@@ -135,32 +139,31 @@ EventHandlerResult Chords::onKeyswitchEvent(Key &mapped_key, KeyAddr key_addr, u
   // - If a relevant key was released, abort the chord
   // - If the timeout triggered, abort the chord
   // TODO: On deramping/deactivating, track re-presses to ensure chord is actually inactive when inactivated
-  if (state == PARTIAL) {
+  if (chord.state == PARTIAL) {
 
     // If all keys are pressed, activate the chord
-    if (keys_pressed == 3) {
-      ::Focus.send(F("Activating chord\n")); 
-      state = PRESSED;
-      mapped_key = Key_LeftShift;
+    if (chord.pressed == (1 << chord.length) - 1) {
+      ::Focus.send(F("Pressing chord\n"));
+      chord.state = PRESSED;
+      mapped_key = chord.action;
       return EventHandlerResult::OK;
     }
 
     // Handle timeout
     // TODO: if two of three were pressed, these should be ordered.
-    if (now - last_time > CHORD_TIMEOUT) {
-      if(keys_pressed & 1)
-        ::Focus.send(F("Pressing C on timeout\n")); 
-      if(keys_pressed & 2)
-        ::Focus.send(F("Pressing V on timeout\n")); 
-      state = ABORTED;
+    if (now - chord.last_time > CHORD_TIMEOUT) {
+      // TODO: actually press the keys.
+      // It turns out that just leaving them pressed works.
+      ::Focus.send(F("Aborting chord on timeout\n"));
+      chord.state = ABORTED;
     }
 
     // Eat relevant key presses, and abort on relevant releases
-    if (mapped_key == Key_C || mapped_key == Key_V) {
+    if (chordKeyIndex != -1) {
       if (keyToggledOff(key_state)) {
-        state = keys_pressed ? ABORTED : INACTIVE;
+        chord.state = chord.pressed ? ABORTED : INACTIVE;
         // TODO: Press the key before releasing it
-        ::Focus.send(F("Aborting chord on key release\n")); 
+        ::Focus.send(F("Aborting chord on key release\n"));
       }
       return EventHandlerResult::EVENT_CONSUMED;
     }
@@ -170,42 +173,41 @@ EventHandlerResult Chords::onKeyswitchEvent(Key &mapped_key, KeyAddr key_addr, u
   }
 
   // If a relevant key was released, release the chord and go to deactivating
-  if (state == PRESSED) {
+  if (chord.state == PRESSED) {
     // Check if a relevant key was released
-    if (keyToggledOff(key_state) && keys_pressed != 3) {
-      state = keys_pressed ? RELEASED : INACTIVE;
-      ::Focus.send(F("Releasing chord\n")); 
-      mapped_key = Key_LeftShift;
+    if (keyToggledOff(key_state) && chord.pressed != (1 << chord.length) - 1) {
+      chord.state = chord.pressed ? RELEASED : INACTIVE;
+      ::Focus.send(F("Releasing chord\n"));
+      mapped_key = chord.action;
       return EventHandlerResult::OK;
     }
 
     // Pick one arbitrarily to pass through for chord still pressed; ignore the other.
-    if(ongoing && (mapped_key == Key_C))
-      return EventHandlerResult::EVENT_CONSUMED;
-    if(ongoing && (mapped_key == Key_V)) {
-      mapped_key = Key_LeftShift;
+    if(ongoing && chordKeyIndex == 0) {
+      mapped_key = chord.action;
       return EventHandlerResult::OK;
     }
+    if(ongoing && chordKeyIndex != -1)
+      return EventHandlerResult::EVENT_CONSUMED;
 
     return EventHandlerResult::OK;
   }
 
-  if (state == RELEASED) {
-    if(keys_pressed == 0)
-      state = INACTIVE;
+  if (chord.state == RELEASED) {
+    if(chord.pressed == 0)
+      chord.state = INACTIVE;
 
     // Check if a relevant key was released
-    if (mapped_key == Key_C || mapped_key == Key_V) {
+    if (chordKeyIndex != -1)
       return EventHandlerResult::EVENT_CONSUMED;
-    }
 
     return EventHandlerResult::OK;
   }
 
-  if (state == ABORTED) {
+  if (chord.state == ABORTED) {
     // Check if chord is fully released
-    if(keys_pressed == 0)
-      state = INACTIVE;
+    if(chord.pressed == 0)
+      chord.state = INACTIVE;
 
     return EventHandlerResult::OK;
   }
