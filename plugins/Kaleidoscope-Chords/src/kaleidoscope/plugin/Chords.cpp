@@ -58,6 +58,8 @@
  *    '------ all keys up
  *
  *
+ * TODO: handle overlapping chords.  This is not trivial.
+ *
  *
  */
 
@@ -72,16 +74,29 @@
 namespace kaleidoscope {
 namespace plugin {
 
-Chords::Chord chord = {
-  .length = 2,
-  .keys = {Key_A, Key_S},
-  .action = Key_Tab
-};
+int nchords = 2;
 
-Chords::ChordState chordState = {
-  .state = Chords::INACTIVE,
-  .pressed = 0,
-  .last_time = 0
+Chords::Chord chords[] = {
+  {
+    .length = 2,
+    .keys = {Key_A, Key_S},
+    .action = Key_Tab
+  }, {
+    .length = 2,
+    .keys = {Key_D, Key_F},
+    .action = Key_Escape
+  }};
+
+Chords::ChordState chordStates[] = {
+  {
+    .state = Chords::INACTIVE,
+    .pressed = 0,
+    .last_time = 0
+  },{
+    .state = Chords::INACTIVE,
+    .pressed = 0,
+    .last_time = 0
+  }
 };
 
 EventHandlerResult Chords::onSetup() {
@@ -106,7 +121,7 @@ EventHandlerResult Chords::onFocusEvent(const char *command) {
   //return EventHandlerResult::EVENT_CONSUMED;
 }
 
-EventHandlerResult Chords::onKeyswitchEvent(Key &mapped_key, KeyAddr key_addr, uint8_t key_state) {
+EventHandlerResult Chords::processChord(Chord &chord, ChordState &chordState, Key &mapped_key, KeyAddr key_addr, uint8_t key_state) {
   uint32_t now = Runtime.millisAtCycleStart();
   bool ongoing = !keyToggledOn(key_state) && keyIsPressed(key_state);
   int8_t chordKeyIndex = -1;
@@ -219,6 +234,16 @@ EventHandlerResult Chords::onKeyswitchEvent(Key &mapped_key, KeyAddr key_addr, u
   }
 
   return EventHandlerResult::OK;
+}
+
+EventHandlerResult Chords::onKeyswitchEvent(Key &mapped_key, KeyAddr key_addr, uint8_t key_state) {
+  EventHandlerResult ret = EventHandlerResult::OK;
+
+  for (int i = 0; i < nchords; i++)
+    if (processChord(chords[i], chordStates[i], mapped_key, key_addr, key_state) == EventHandlerResult::EVENT_CONSUMED)
+      ret = EventHandlerResult::EVENT_CONSUMED;
+
+  return ret;
 }
 
 }

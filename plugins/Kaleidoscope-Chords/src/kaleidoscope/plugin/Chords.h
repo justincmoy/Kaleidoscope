@@ -23,13 +23,6 @@ namespace kaleidoscope {
 namespace plugin {
 class Chords : public kaleidoscope::Plugin {
  public:
-
-  Chords(void) {}
-
-  EventHandlerResult onSetup();
-  EventHandlerResult onFocusEvent(const char *command);
-  EventHandlerResult onKeyswitchEvent(Key &, KeyAddr, uint8_t);
-
   typedef struct {
     uint8_t length;
     Key keys[5];
@@ -49,6 +42,14 @@ class Chords : public kaleidoscope::Plugin {
     uint8_t pressed;
     uint32_t last_time;
   } ChordState;
+
+  Chords(void) {}
+
+  EventHandlerResult onSetup();
+  EventHandlerResult onFocusEvent(const char *command);
+  EventHandlerResult processChord(Chord &, ChordState &, Key &, KeyAddr, uint8_t);
+  EventHandlerResult onKeyswitchEvent(Key &, KeyAddr, uint8_t);
+
   /*static void setup(uint8_t max);
 
   static void max_layers(uint8_t max);
