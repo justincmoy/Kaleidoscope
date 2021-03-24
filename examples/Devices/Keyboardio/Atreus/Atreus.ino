@@ -123,10 +123,10 @@ KEYMAPS(
       ,Key_Z ,Key_X ,___ ,___ ,Key_B ,UN(SHORTCUT)
       ,___ ,___ ,___ ,___ ,___ ,___
 
-      ,___ ,___ ,___ ,___ ,___
+      ,Key_Z ,Key_X ,___ ,___ ,___
       ,Key_H     ,Key_J      ,Key_K     ,Key_L      ,___
       ,___ ,___ ,___ ,___ ,___ ,___
-      ,LCTRL(LSHIFT(Key_N)) ,___ ,___ ,___ ,___ ,Key_Enter
+      ,LCTRL(LSHIFT(Key_N)) ,Key_Space ,Key_B ,___ ,___ ,Key_Enter
    )
 )
 /* *INDENT-ON* */
