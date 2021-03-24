@@ -69,12 +69,12 @@
 #include "kaleidoscope/Runtime.h"
 #include "kaleidoscope/device/key_indexes.h"
 
-#define CHORD_TIMEOUT 12
+#define CHORD_TIMEOUT 14
 
 namespace kaleidoscope {
 namespace plugin {
 
-int nchords = 2;
+int nchords = 8;
 
 Chords::Chord chords[] = {
   {
@@ -85,10 +85,54 @@ Chords::Chord chords[] = {
     .length = 2,
     .keys = {Key_D, Key_F},
     .action = Key_Escape
+  }, {
+    .length = 2,
+    .keys = {Key_Z, Key_X},
+    .action = Key_LeftGui
+  }, {
+    .length = 2,
+    .keys = {Key_X, Key_C},
+    .action = Key_LeftAlt
+  }, {
+    .length = 2,
+    .keys = {Key_C, Key_V},
+    .action = Key_LeftControl
+  }, {
+    .length = 2,
+    .keys = {Key_Slash, Key_Period},
+    .action = Key_LeftGui
+  }, {
+    .length = 2,
+    .keys = {Key_Period, Key_Comma},
+    .action = Key_LeftAlt
+  }, {
+    .length = 2,
+    .keys = {Key_Comma, Key_M},
+    .action = Key_LeftControl
   }};
 
 Chords::ChordState chordStates[] = {
   {
+    .state = Chords::INACTIVE,
+    .pressed = 0,
+    .last_time = 0
+  },{
+    .state = Chords::INACTIVE,
+    .pressed = 0,
+    .last_time = 0
+  },{
+    .state = Chords::INACTIVE,
+    .pressed = 0,
+    .last_time = 0
+  },{
+    .state = Chords::INACTIVE,
+    .pressed = 0,
+    .last_time = 0
+  },{
+    .state = Chords::INACTIVE,
+    .pressed = 0,
+    .last_time = 0
+  },{
     .state = Chords::INACTIVE,
     .pressed = 0,
     .last_time = 0
@@ -138,16 +182,16 @@ EventHandlerResult Chords::processChord(Chord &chord, ChordState &chordState, Ke
   }
   if (chordKeyIndex != -1 && keyToggledOff(key_state)) {
     chordState.pressed &= ~(1 << chordKeyIndex);
-    ::Focus.send(F("Releasing key: <"));
-    ::Focus.send(chordState.pressed);
-    ::Focus.send(F(">\n"));
+    //::Focus.send(F("Releasing key: <"));
+    //::Focus.send(chordState.pressed);
+    //::Focus.send(F(">\n"));
   }
 
   // If inactive and a relevant key was pressed, eat it and switch to activating.
   if (chordState.state == INACTIVE) {
     if (chordState.pressed) {
       chordState.state = PARTIAL;
-      ::Focus.send(F("Starting partial chord\n"));
+      //::Focus.send(F("Starting partial chord\n"));
       return EventHandlerResult::EVENT_CONSUMED;
     }
     return EventHandlerResult::OK;
@@ -164,7 +208,7 @@ EventHandlerResult Chords::processChord(Chord &chord, ChordState &chordState, Ke
 
     // If all keys are pressed, activate the chord
     if (chordState.pressed == (1 << chord.length) - 1) {
-      ::Focus.send(F("Pressing chord\n"));
+      //::Focus.send(F("Pressing chord\n"));
       chordState.state = PRESSED;
       mapped_key = chord.action;
       return EventHandlerResult::OK;
@@ -175,7 +219,7 @@ EventHandlerResult Chords::processChord(Chord &chord, ChordState &chordState, Ke
     if (now - chordState.last_time > CHORD_TIMEOUT) {
       // TODO: actually press the keys.
       // It turns out that just leaving them pressed works.
-      ::Focus.send(F("Aborting chord on timeout\n"));
+      //::Focus.send(F("Aborting chord on timeout\n"));
       chordState.state = ABORTED;
     }
 
@@ -184,7 +228,7 @@ EventHandlerResult Chords::processChord(Chord &chord, ChordState &chordState, Ke
       if (keyToggledOff(key_state)) {
         chordState.state = chordState.pressed ? ABORTED : INACTIVE;
         // TODO: Press the key before releasing it
-        ::Focus.send(F("Aborting chord on key release\n"));
+        //::Focus.send(F("Aborting chord on key release\n"));
       }
       return EventHandlerResult::EVENT_CONSUMED;
     }
@@ -198,7 +242,7 @@ EventHandlerResult Chords::processChord(Chord &chord, ChordState &chordState, Ke
     // Check if a relevant key was released
     if (keyToggledOff(key_state) && chordState.pressed != (1 << chord.length) - 1) {
       chordState.state = chordState.pressed ? RELEASED : INACTIVE;
-      ::Focus.send(F("Releasing chord\n"));
+      //::Focus.send(F("Releasing chord\n"));
       mapped_key = chord.action;
       return EventHandlerResult::OK;
     }

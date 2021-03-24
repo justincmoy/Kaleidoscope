@@ -66,9 +66,9 @@ EventHandlerResult KeyTimings::onKeyswitchEvent(Key &mapped_key, KeyAddr key_add
     last_down = true;
   }
   else if (keyToggledOff(key_state)) {
-    ::Focus.send(now - last_time);
-    ::Focus.send(F("Key released\n"));
-    last_time = now;
+    //::Focus.send(now - last_time);
+    //::Focus.send(F("Key released\n"));
+    //last_time = now;
     last_down = false;
   }
 
