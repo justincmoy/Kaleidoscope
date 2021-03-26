@@ -84,7 +84,7 @@ Chords::Chord chords[nchords] = {
   }, {
     .length = 2,
     .keys = {Key_D, Key_F},
-    .action = Key_Escape
+    .action = Key_Minus
   }, {
     .length = 2,
     .keys = {Key_Z, Key_X},
@@ -120,7 +120,7 @@ Chords::Chord chords[nchords] = {
   }, {
     .length = 2,
     .keys = {Key_J, Key_K},
-    .action = Key_Minus
+    .action = Key_Escape
   }};
 
 Chords::ChordState chordStates[nchords];
