@@ -74,7 +74,7 @@
 namespace kaleidoscope {
 namespace plugin {
 
-const int nchords = 10;
+const int nchords = 11;
 
 Chords::Chord chords[nchords] = {
   {
@@ -117,6 +117,10 @@ Chords::Chord chords[nchords] = {
     .length = 2,
     .keys = {Key_Slash, Key_M},
     .action = Key_RightAlt
+  }, {
+    .length = 2,
+    .keys = {Key_J, Key_K},
+    .action = Key_Minus
   }};
 
 Chords::ChordState chordStates[nchords];
