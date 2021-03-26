@@ -250,6 +250,14 @@ EventHandlerResult Chords::processChord(Chord &chord, ChordState &chordState, Ke
     if(chordState.pressed == 0)
       chordState.state = INACTIVE;
 
+    // Check if the chord is fully pressed again
+    if (chordState.pressed == (1 << chord.length) - 1) {
+      //::Focus.send(F("Pressing chord\n"));
+      chordState.state = PRESSED;
+      mapped_key = chord.action;
+      return EventHandlerResult::OK;
+    }
+
     // Check if a relevant key was released
     if (chordKeyIndex != -1)
       return EventHandlerResult::EVENT_CONSUMED;
