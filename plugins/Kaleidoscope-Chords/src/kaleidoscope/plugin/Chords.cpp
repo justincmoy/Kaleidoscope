@@ -69,7 +69,7 @@
 #include "kaleidoscope/Runtime.h"
 #include "kaleidoscope/device/key_indexes.h"
 
-#define CHORD_TIMEOUT 14
+#define CHORD_TIMEOUT 18
 
 namespace kaleidoscope {
 namespace plugin {
