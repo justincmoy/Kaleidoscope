@@ -74,7 +74,7 @@
 namespace kaleidoscope {
 namespace plugin {
 
-int nchords = 10;
+const int nchords = 10;
 
 Chords::Chord chords[] = {
   {
@@ -119,47 +119,15 @@ Chords::Chord chords[] = {
     .action = Key_RightAlt
   }};
 
-Chords::ChordState chordStates[] = {
-  {
-    .state = Chords::INACTIVE,
-    .pressed = 0,
-    .last_time = 0
-  },{
-    .state = Chords::INACTIVE,
-    .pressed = 0,
-    .last_time = 0
-  },{
-    .state = Chords::INACTIVE,
-    .pressed = 0,
-    .last_time = 0
-  },{
-    .state = Chords::INACTIVE,
-    .pressed = 0,
-    .last_time = 0
-  },{
-    .state = Chords::INACTIVE,
-    .pressed = 0,
-    .last_time = 0
-  },{
-    .state = Chords::INACTIVE,
-    .pressed = 0,
-    .last_time = 0
-  },{
-    .state = Chords::INACTIVE,
-    .pressed = 0,
-    .last_time = 0
-  },{
-    .state = Chords::INACTIVE,
-    .pressed = 0,
-    .last_time = 0
-  },{
-    .state = Chords::INACTIVE,
-    .pressed = 0,
-    .last_time = 0
-  }
-};
+Chords::ChordState chordStates[nchords];
 
 EventHandlerResult Chords::onSetup() {
+  for(int i = 0; i < nchords; i++) {
+    chordStates[i].state = Chords::INACTIVE;
+    chordStates[i].pressed = 0;
+    chordStates[i].last_time = 0;
+  }
+
   return EventHandlerResult::OK;
 }
 
