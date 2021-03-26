@@ -76,7 +76,7 @@ namespace plugin {
 
 const int nchords = 10;
 
-Chords::Chord chords[] = {
+Chords::Chord chords[nchords] = {
   {
     .length = 2,
     .keys = {Key_A, Key_S},
