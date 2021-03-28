@@ -95,7 +95,7 @@ Chords::Chord chords[nchords] = {
     .action = Key_LeftAlt
   }, {
     .length = 2,
-    .keys = {Key_Z, Key_V},
+    .keys = {Key_V, Key_B},
     .action = Key_RightAlt
   }, {
     .length = 2,
@@ -115,7 +115,7 @@ Chords::Chord chords[nchords] = {
     .action = Key_LeftControl
   }, {
     .length = 2,
-    .keys = {Key_Slash, Key_M},
+    .keys = {Key_M, Key_N},
     .action = Key_RightAlt
   }, {
     .length = 2,
