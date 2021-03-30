@@ -1,5 +1,5 @@
-# KeyTimings
+# Chords
 
-Uses focus to log how long it is between keypresses.
+Like MagicCombo, but eats keypresses.
 
-Intended for experimenting to see how feasible time-based chording is.
+Very much a work in progress, and probably not too easy to work with.
