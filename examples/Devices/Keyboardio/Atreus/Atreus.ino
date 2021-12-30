@@ -41,7 +41,8 @@
 
 enum {
   MACRO_QWERTY,
-  MACRO_VERSION_INFO
+  MACRO_VERSION_INFO,
+  MACRO_ACCENT_GRAVE = 2
 };
 
 #define Key_Exclamation LSHIFT(Key_1)
@@ -159,6 +160,12 @@ const macro_t *macroAction(uint8_t macroIndex, uint8_t keyState) {
   case MACRO_VERSION_INFO:
     if (keyToggledOn(keyState)) {
       Macros.type(PSTR("Keyboardio Atreus - Kaleidoscope "));
+      Macros.type(PSTR(BUILD_INFORMATION));
+    }
+    break;
+  case MACRO_ACCENT_GRAVE:
+    if (keyToggledOn(keyState)) {
+      return MACRO(I(50), D(RightAlt), T(Backtick), U(RightAlt));
       Macros.type(PSTR(BUILD_INFORMATION));
     }
     break;

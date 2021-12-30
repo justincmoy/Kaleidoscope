@@ -121,6 +121,10 @@ Chords::Chord chords[nchords] = {
     .length = 2,
     .keys = {Key_J, Key_K},
     .action = Key_Escape
+  }, {
+    .length = 2,
+    .keys = {Key_Backtick, Key_B},
+    .action = M(2)
   }};
 
 Chords::ChordState chordStates[nchords];
