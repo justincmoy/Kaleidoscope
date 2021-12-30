@@ -69,21 +69,21 @@
 #include "kaleidoscope/Runtime.h"
 #include "kaleidoscope/device/key_indexes.h"
 
-#define CHORD_TIMEOUT 18
+#include "Kaleidoscope-Macros.h"
+
+#define CHORD_TIMEOUT 24
 
 namespace kaleidoscope {
 namespace plugin {
 
-const int nchords = 11;
-
-Chords::Chord chords[nchords] = {
+Chords::Chord chords[] = {
   {
     .length = 2,
-    .keys = {Key_A, Key_S},
+    .keys = {Key_F, Key_R},
     .action = Key_Tab
   }, {
     .length = 2,
-    .keys = {Key_D, Key_F},
+    .keys = {Key_V, Key_F},
     .action = Key_Minus
   }, {
     .length = 2,
@@ -95,7 +95,7 @@ Chords::Chord chords[nchords] = {
     .action = Key_LeftAlt
   }, {
     .length = 2,
-    .keys = {Key_V, Key_B},
+    .keys = {Key_D, Key_C},
     .action = Key_RightAlt
   }, {
     .length = 2,
@@ -115,17 +115,21 @@ Chords::Chord chords[nchords] = {
     .action = Key_LeftControl
   }, {
     .length = 2,
-    .keys = {Key_M, Key_N},
+    .keys = {Key_K, Key_Comma},
     .action = Key_RightAlt
   }, {
     .length = 2,
-    .keys = {Key_J, Key_K},
+    .keys = {Key_J, Key_M},
     .action = Key_Escape
   }, {
     .length = 2,
     .keys = {Key_Backtick, Key_B},
     .action = M(2)
   }};
+
+
+const int nchords = sizeof(chords) / sizeof(chords[0]);
+
 
 Chords::ChordState chordStates[nchords];
 
