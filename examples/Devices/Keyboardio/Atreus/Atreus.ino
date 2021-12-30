@@ -107,7 +107,7 @@ KEYMAPS(
   (
        Key_Insert            ,Key_Home                 ,Key_UpArrow   ,Key_End        ,Key_PageUp
       ,Key_Delete            ,Key_LeftArrow            ,Key_DownArrow ,Key_RightArrow ,Key_PageDown
-      ,M(MACRO_VERSION_INFO) ,Consumer_VolumeIncrement ,XXX           ,XXX            ,___ ,TG(SHORTCUT)
+      ,M(MACRO_VERSION_INFO) ,Consumer_VolumeIncrement ,Consumer_Mute ,XXX            ,___ ,TG(SHORTCUT)
       ,MoveToLayer(NOLMTS)   ,Consumer_VolumeDecrement ,___           ,MoveToLayer(QWERTY) ,___ ,___
 
                 ,Key_UpArrow   ,Key_F7              ,Key_F8          ,Key_F9         ,Key_F10
