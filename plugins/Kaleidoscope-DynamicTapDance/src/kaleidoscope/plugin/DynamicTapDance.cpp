@@ -1,5 +1,5 @@
 /* DynamicTapDance -- Dynamic TapDance support for Kaleidoscope
- * Copyright (C) 2019  Keyboard.io, Inc
+ * Copyright (C) 2019, 2021  Keyboard.io, Inc
  * Copyright (C) 2019  Dygma Lab S.L.
  *
  * This program is free software: you can redistribute it and/or modify it under
@@ -19,6 +19,8 @@
 
 #include <Kaleidoscope-EEPROM-Settings.h>
 #include "Kaleidoscope-FocusSerial.h"
+#include "kaleidoscope/Runtime.h"
+#include "kaleidoscope/KeyEvent.h"
 
 namespace kaleidoscope {
 namespace plugin {
@@ -72,18 +74,22 @@ bool DynamicTapDance::dance(uint8_t tap_dance_index, KeyAddr key_addr,
     break;
   case TapDance::Interrupt:
   case TapDance::Timeout:
-    handleKeyswitchEvent(key, key_addr, IS_PRESSED | INJECTED);
+    Runtime.handleKeyEvent(KeyEvent(key_addr, IS_PRESSED, key));
     break;
   case TapDance::Hold:
-    handleKeyswitchEvent(key, key_addr, IS_PRESSED | WAS_PRESSED | INJECTED);
+    Runtime.handleKeyEvent(KeyEvent(key_addr, IS_PRESSED | WAS_PRESSED, key));
     break;
   case TapDance::Release:
-    kaleidoscope::Runtime.hid().keyboard().sendReport();
-    handleKeyswitchEvent(key, key_addr, WAS_PRESSED | INJECTED);
+    //kaleidoscope::Runtime.hid().keyboard().sendReport();
+    Runtime.handleKeyEvent(KeyEvent(key_addr, WAS_PRESSED, key));
     break;
   }
 
   return true;
+}
+
+EventHandlerResult DynamicTapDance::onNameQuery() {
+  return ::Focus.sendName(F("DynamicTapDance"));
 }
 
 EventHandlerResult DynamicTapDance::onFocusEvent(const char *command) {

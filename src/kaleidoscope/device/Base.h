@@ -1,6 +1,6 @@
 /* -*- mode: c++ -*-
  * kaleidoscope::device::Base -- Kaleidoscope device Base class
- * Copyright (C) 2017, 2018, 2019  Keyboard.io, Inc
+ * Copyright (C) 2017-2021  Keyboard.io, Inc
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,7 +25,7 @@
 #include "kaleidoscope_internal/deprecations.h"
 #include "kaleidoscope/macro_helpers.h"
 
-#include "kaleidoscope/driver/hid/Keyboardio.h"
+#include "kaleidoscope/driver/hid/Base.h"
 #include "kaleidoscope/driver/keyscanner/None.h"
 #include "kaleidoscope/driver/led/None.h"
 #include "kaleidoscope/driver/mcu/None.h"
@@ -53,8 +53,8 @@ namespace kaleidoscope {
 namespace device {
 
 struct BaseProps {
-  typedef kaleidoscope::driver::hid::KeyboardioProps HIDProps;
-  typedef kaleidoscope::driver::hid::Keyboardio<HIDProps> HID;
+  typedef kaleidoscope::driver::hid::BaseProps HIDProps;
+  typedef kaleidoscope::driver::hid::Base<HIDProps> HID;
   typedef kaleidoscope::driver::keyscanner::BaseProps KeyScannerProps;
   typedef kaleidoscope::driver::keyscanner::None KeyScanner;
   typedef kaleidoscope::driver::led::BaseProps LEDDriverProps;
@@ -73,9 +73,28 @@ class Base {
   class NoOpSerial {
    public:
     NoOpSerial() {}
+    void begin(uint32_t baud) {}
+    size_t print(...) {
+      return 0;
+    }
+    size_t println(...) {
+      return 0;
+    }
+    int peek() {
+      return 0;
+    }
+    long parseInt() { // NOLINT(runtime/int)
+      return 0;
+    }
+    int available() {
+      return 0;
+    }
+    int read() {
+      return 0;
+    }
   };
 
-  static NoOpSerial noop_serial_;
+  NoOpSerial noop_serial_;
 
  public:
   Base() {}

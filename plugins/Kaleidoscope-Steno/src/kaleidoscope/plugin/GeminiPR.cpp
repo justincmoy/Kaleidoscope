@@ -1,6 +1,6 @@
 /* Kaleidoscope-Steno -- Steno protocols for Kaleidoscope
  * Copyright (C) 2017  Joseph Wasson
- * Copyright (C) 2017, 2018  Keyboard.io, Inc.
+ * Copyright (C) 2017-2021  Keyboard.io, Inc.
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@
  */
 
 #include <Kaleidoscope-Steno.h>
+#include <Kaleidoscope-FocusSerial.h>
 #include "kaleidoscope/keyswitch_state.h"
 
 namespace kaleidoscope {
@@ -25,17 +26,20 @@ namespace steno {
 uint8_t GeminiPR::keys_held_;
 uint8_t GeminiPR::state_[6];
 
-EventHandlerResult GeminiPR::onKeyswitchEvent(Key &mapped_key, KeyAddr key_addr, uint8_t keyState) {
-  if (mapped_key < geminipr::START ||
-      mapped_key > geminipr::END)
+EventHandlerResult GeminiPR::onNameQuery() {
+  return ::Focus.sendName(F("GeminiPR"));
+}
+
+EventHandlerResult GeminiPR::onKeyEvent(KeyEvent &event) {
+  if (event.key < geminipr::START || event.key > geminipr::END)
     return EventHandlerResult::OK;
 
-  if (keyToggledOn(keyState)) {
-    uint8_t key = mapped_key.getRaw() - geminipr::START;
+  if (keyToggledOn(event.state)) {
+    uint8_t key = event.key.getRaw() - geminipr::START;
     ++keys_held_;
 
     state_[key / 7] |= 1 << (6 - (key % 7));
-  } else if (keyToggledOff(keyState)) {
+  } else {
     --keys_held_;
 
     if (keys_held_ == 0) {

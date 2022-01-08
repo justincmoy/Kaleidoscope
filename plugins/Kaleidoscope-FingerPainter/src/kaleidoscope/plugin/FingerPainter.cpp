@@ -1,6 +1,6 @@
 /* -*- mode: c++ -*-
  * Kaleidoscope-FingerPainter -- On-the-fly keyboard painting.
- * Copyright (C) 2017, 2018  Keyboard.io, Inc
+ * Copyright (C) 2017-2021  Keyboard.io, Inc
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,6 +29,10 @@ namespace plugin {
 uint16_t FingerPainter::color_base_;
 bool FingerPainter::edit_mode_;
 
+EventHandlerResult FingerPainter::onNameQuery() {
+  return ::Focus.sendName(F("FingerPainter"));
+}
+
 EventHandlerResult FingerPainter::onSetup() {
   color_base_ = ::LEDPaletteTheme.reserveThemes(1);
   return EventHandlerResult::OK;
@@ -46,20 +50,22 @@ void FingerPainter::toggle(void) {
   edit_mode_ = !edit_mode_;
 }
 
-EventHandlerResult FingerPainter::onKeyswitchEvent(Key &mapped_key, KeyAddr key_addr, uint8_t key_state) {
+EventHandlerResult FingerPainter::onKeyEvent(KeyEvent &event) {
   if (!Runtime.has_leds || !edit_mode_)
     return EventHandlerResult::OK;
 
-  if (!keyToggledOn(key_state)) {
-    return EventHandlerResult::EVENT_CONSUMED;
+  if (keyToggledOff(event.state)) {
+    return EventHandlerResult::OK;
   }
 
-  if (!key_addr.isValid())
-    return EventHandlerResult::EVENT_CONSUMED;
+  if (!event.addr.isValid())
+    return EventHandlerResult::OK;
 
   // TODO(anyone): The following works only for keyboards with LEDs for each key.
 
-  uint8_t color_index = ::LEDPaletteTheme.lookupColorIndexAtPosition(color_base_, Runtime.device().getLedIndex(key_addr));
+  uint8_t color_index = ::LEDPaletteTheme
+                        .lookupColorIndexAtPosition(color_base_,
+                                                    Runtime.device().getLedIndex(event.addr));
 
   // Find the next color in the palette that is different.
   // But do not loop forever!
@@ -76,7 +82,9 @@ EventHandlerResult FingerPainter::onKeyswitchEvent(Key &mapped_key, KeyAddr key_
     new_color = ::LEDPaletteTheme.lookupPaletteColor(color_index);
   }
 
-  ::LEDPaletteTheme.updateColorIndexAtPosition(color_base_, Runtime.device().getLedIndex(key_addr), color_index);
+  ::LEDPaletteTheme.updateColorIndexAtPosition(color_base_,
+                                               Runtime.device().getLedIndex(event.addr),
+                                               color_index);
 
   return EventHandlerResult::EVENT_CONSUMED;
 }

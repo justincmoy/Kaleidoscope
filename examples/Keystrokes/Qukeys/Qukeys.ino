@@ -6,6 +6,11 @@
 
 enum { MACRO_TOGGLE_QUKEYS };
 
+// To define DualUse Qukeys in the keymap itself, we can use `SFT_T(key)`,
+// `CTL_T(key)`, `ALT_T(key)`, `GUI_T(key)`, and `LT(layer, key)`, as defined
+// for the home row on the right side of the keymap (and one of the palm keys)
+// below.
+
 // *INDENT-OFF*
 KEYMAPS(
   [0] = KEYMAP_STACKED
@@ -49,10 +54,10 @@ KEYMAPS(
 // *INDENT-ON*
 
 // Defining a macro (on the "any" key: see above) to toggle Qukeys on and off
-const macro_t *macroAction(uint8_t macro_index, uint8_t key_state) {
-  switch (macro_index) {
+const macro_t *macroAction(uint8_t macro_id, KeyEvent &event) {
+  switch (macro_id) {
   case MACRO_TOGGLE_QUKEYS:
-    if (keyToggledOn(key_state))
+    if (keyToggledOn(event.state))
       Qukeys.toggle();
     break;
   }
@@ -63,6 +68,9 @@ const macro_t *macroAction(uint8_t macro_index, uint8_t key_state) {
 KALEIDOSCOPE_INIT_PLUGINS(Qukeys, Macros);
 
 void setup() {
+  // The following Qukey definitions are for the left side of the home row (and
+  // the left palm key) of the Keyboardio Model01 keyboard.  For other
+  // keyboards, the `KeyAddr(row, col)` coordinates will need adjustment.
   QUKEYS(
     kaleidoscope::plugin::Qukey(0, KeyAddr(2, 1), Key_LeftGui),      // A/cmd
     kaleidoscope::plugin::Qukey(0, KeyAddr(2, 2), Key_LeftAlt),      // S/alt
@@ -74,6 +82,7 @@ void setup() {
   Qukeys.setOverlapThreshold(50);
   Qukeys.setMinimumHoldTime(100);
   Qukeys.setMinimumPriorInterval(80);
+  Qukeys.setMaxIntervalForTapRepeat(150);
 
   Kaleidoscope.setup();
 }

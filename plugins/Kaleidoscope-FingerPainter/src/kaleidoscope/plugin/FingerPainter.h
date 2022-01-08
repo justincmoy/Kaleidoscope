@@ -1,6 +1,6 @@
 /* -*- mode: c++ -*-
  * Kaleidoscope-FingerPainter -- On-the-fly keyboard painting.
- * Copyright (C) 2017, 2018  Keyboard.io, Inc
+ * Copyright (C) 2017-2021  Keyboard.io, Inc
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -32,9 +32,10 @@ class FingerPainter : public LEDMode {
 
   static void toggle(void);
 
-  EventHandlerResult onKeyswitchEvent(Key &mapped_key, KeyAddr key_addr, uint8_t key_state);
+  EventHandlerResult onKeyEvent(KeyEvent &event);
   EventHandlerResult onFocusEvent(const char *command);
   EventHandlerResult onSetup();
+  EventHandlerResult onNameQuery();
 
  protected:
   void update(void) final;

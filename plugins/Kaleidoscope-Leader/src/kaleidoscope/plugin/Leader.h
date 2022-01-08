@@ -1,6 +1,6 @@
 /* -*- mode: c++ -*-
  * Kaleidoscope-Leader -- VIM-style leader keys
- * Copyright (C) 2016, 2017, 2018  Keyboard.io, Inc
+ * Copyright (C) 2016, 2017, 2018, 2021  Keyboard.io, Inc
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,8 +17,9 @@
 
 #pragma once
 
-#include "kaleidoscope/Runtime.h"
 #include <Kaleidoscope-Ranges.h>
+#include "kaleidoscope/KeyEventTracker.h"
+#include "kaleidoscope/plugin.h"
 
 #define LEADER_MAX_SEQUENCE_LENGTH 4
 
@@ -46,11 +47,13 @@ class Leader : public kaleidoscope::Plugin {
 
   void inject(Key key, uint8_t key_state);
 
-  EventHandlerResult onKeyswitchEvent(Key &mapped_key, KeyAddr key_addr, uint8_t keyState);
+  EventHandlerResult onNameQuery();
+  EventHandlerResult onKeyswitchEvent(KeyEvent &event);
   EventHandlerResult afterEachCycle();
 
  private:
   static Key sequence_[LEADER_MAX_SEQUENCE_LENGTH + 1];
+  static KeyEventTracker event_tracker_;
   static uint8_t sequence_pos_;
   static uint16_t start_time_;
 

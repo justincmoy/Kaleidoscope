@@ -1,6 +1,6 @@
 /* -*- mode: c++ -*-
  * Kaleidoscope-FocusSerial -- Bidirectional communication plugin
- * Copyright (C) 2017, 2018  Keyboard.io, Inc
+ * Copyright (C) 2017, 2018, 2021  Keyboard.io, Inc
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -32,7 +32,7 @@ void FocusSerial::drain(void) {
       Runtime.serialPort().read();
 }
 
-EventHandlerResult FocusSerial::beforeReportingState() {
+EventHandlerResult FocusSerial::afterEachCycle() {
   if (Runtime.serialPort().available() == 0)
     return EventHandlerResult::OK;
 
@@ -70,7 +70,14 @@ bool FocusSerial::handleHelp(const char *command,
 }
 
 EventHandlerResult FocusSerial::onFocusEvent(const char *command) {
-  handleHelp(command, PSTR("help"));
+  if (handleHelp(command, PSTR("help\nplugins")))
+    return EventHandlerResult::OK;
+
+  if (strcmp_P(command, PSTR("plugins")) == 0) {
+    kaleidoscope::Hooks::onNameQuery();
+    return EventHandlerResult::EVENT_CONSUMED;
+  }
+
   return EventHandlerResult::OK;
 }
 

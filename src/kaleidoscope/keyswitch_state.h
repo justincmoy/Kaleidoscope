@@ -19,10 +19,9 @@
 
 #include <Arduino.h>
 
-#define INJECTED    B10000000
-#define EPHEMERAL   B01000000
-#define IS_PRESSED  B00000010
-#define WAS_PRESSED B00000001
+#define INJECTED    0b10000000
+#define IS_PRESSED  0b00000010
+#define WAS_PRESSED 0b00000001
 
 /* keyIsPressed(): This is true if the key is pressed during this scan cycle.
  * This will be true for several consecutive cycles even for a single tap of
@@ -51,3 +50,9 @@
  *   "key-up" event.
  */
 #define keyToggledOff(keyState) (keyWasPressed(keyState) && ! keyIsPressed(keyState))
+
+/* keyIsInjected(): This is true if the key was marked as injected by another
+ * plugin, i.e. it was generated artificially instead of corresponding to a
+ * "real" keypress.
+ */
+#define keyIsInjected(keyState) ((keyState) & INJECTED)

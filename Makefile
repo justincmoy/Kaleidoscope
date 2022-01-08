@@ -11,10 +11,8 @@ endif
 
 DEFAULT_GOAL: smoke-sketches
 
-PLUGIN_TEST_SUPPORT_DIR ?= $(ARDUINO_DIRECTORIES_USER)/hardware/keyboardio/build-tools/
-PLUGIN_TEST_BIN_DIR ?= $(PLUGIN_TEST_SUPPORT_DIR)/../toolchain/$(shell gcc --print-multiarch)/bin
 
-setup: $(ARDUINO_DIRECTORIES_USER)/hardware/keyboardio/avr/boards.txt $(ARDUINO_DIRECTORIES_USER)/hardware/keyboardio/virtual/boards.txt $(ARDUINO_CLI_PATH) configure-arduino-cli install-arduino-core-avr
+setup: $(ARDUINO_CLI_PATH) $(ARDUINO_DIRECTORIES_DATA)/arduino-cli.yaml install-arduino-core-avr install-arduino-core-kaleidoscope $(ARDUINO_DIRECTORIES_USER)/hardware/keyboardio/avr/boards.txt $(ARDUINO_DIRECTORIES_USER)/hardware/keyboardio/virtual/boards.txt 
 	@:
 
 
@@ -29,11 +27,24 @@ $(ARDUINO_DIRECTORIES_USER)/hardware/keyboardio/virtual/boards.txt:
 
 
 $(ARDUINO_DIRECTORIES_USER)/hardware/keyboardio/avr/boards.txt:
-	git clone -c core.symlinks=true --recurse-submodules=":(exclude)avr/libraries/Kaleidoscope" --recurse-submodules=build-tools --recurse-submodules=toolchain --recurse-submodules=avr/libraries/ git://github.com/keyboardio/Kaleidoscope-Bundle-Keyboardio $(ARDUINO_DIRECTORIES_USER)/hardware/keyboardio
-	rm -d $(ARDUINO_DIRECTORIES_USER)/hardware/keyboardio/avr/libraries/Kaleidoscope
+	git clone -c core.symlinks=true \
+		--recurse-submodules=":(exclude)avr/libraries/Kaleidoscope" \
+		--recurse-submodules=":(exclude)gd32/libraries/Kaleidoscope" \
+		--recurse-submodules=avr/libraries/ \
+		--recurse-submodules=gd32/ \
+		--recurse-submodules=gd32/libraries/ \
+		git://github.com/keyboardio/Kaleidoscope-Bundle-Keyboardio \
+		$(ARDUINO_DIRECTORIES_USER)/hardware/keyboardio
+	-rm -d $(ARDUINO_DIRECTORIES_USER)/hardware/keyboardio/avr/libraries/Kaleidoscope
 	ln -s $(KALEIDOSCOPE_DIR) $(ARDUINO_DIRECTORIES_USER)/hardware/keyboardio/avr/libraries/Kaleidoscope
+	git clone -c core.symlinks=true \
+		--recurse-submodules=":(exclude)libraries/Kaleidoscope" \
+		--recurse-submodules=libraries/ \
+		git://github.com/keyboardio/ArduinoCore-GD32-Keyboardio $(ARDUINO_DIRECTORIES_USER)/hardware/keyboardio/gd32
+	-rm -d $(ARDUINO_DIRECTORIES_USER)/hardware/keyboardio/gd32/libraries/Kaleidoscope
+	ln -s $(KALEIDOSCOPE_DIR) $(ARDUINO_DIRECTORIES_USER)/hardware/keyboardio/gd32/libraries/Kaleidoscope
 
-simulator-tests: setup
+simulator-tests:
 	$(MAKE) -C tests all
 
 docker-simulator-tests:
@@ -89,11 +100,6 @@ shellcheck:
 	fi
 
 
-check-docs:
-	doxygen $(PLUGIN_TEST_SUPPORT_DIR)/quality/etc/check-docs.conf 2> /dev/null >/dev/null
-	python $(PLUGIN_TEST_SUPPORT_DIR)/quality/doxy-coverage.py /tmp/undocced/xml
-
-
 SMOKE_SKETCHES=$(sort $(shell if [ -d ./examples ]; then find ./examples -type f -name \*ino | xargs -n 1 dirname; fi))
 
 smoke-sketches: $(SMOKE_SKETCHES)
@@ -114,7 +120,7 @@ $(SMOKE_SKETCHES): force
 build-arduino-nightly-package:
 	perl bin/build-arduino-package \
 		--kaleidoscope-tag=master \
-		--version `date +%Y.%m.%d%H%M%S` \
+		--version `date +%Y.%-m.%-d%H%M%S` \
 		--index-filename-slug=kaleidoscope_master \
 		--only-one-platform-revision \
 		--push \

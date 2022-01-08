@@ -1,6 +1,6 @@
 /* -*- mode: c++ -*-
  * Kaleidoscope-Syster -- Symbolic input system
- * Copyright (C) 2017, 2018, 2019  Keyboard.io, Inc
+ * Copyright (C) 2017-2021  Keyboard.io, Inc
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -35,24 +35,29 @@ class Syster : public kaleidoscope::Plugin {
     SymbolAction
   } action_t;
 
-  Syster(void) {}
+  Syster() {}
 
-  static void reset(void);
+  static void reset();
 
-  bool is_active(void);
+  bool is_active();
 
-  EventHandlerResult onKeyswitchEvent(Key &mapped_key, KeyAddr key_addr, uint8_t keyState);
+  EventHandlerResult onNameQuery();
+  EventHandlerResult onKeyEvent(KeyEvent &event);
 
  private:
   static char symbol_[SYSTER_MAX_SYMBOL_LENGTH + 1];
   static uint8_t symbol_pos_;
   static bool is_active_;
 };
-}
 
-}
+} // namespace plugin
+
+void eraseChars(int8_t n);
+
+} // namespace kaleidoscope
 
 const char keyToChar(Key key);
+
 void systerAction(kaleidoscope::plugin::Syster::action_t action, const char *symbol);
 
 extern kaleidoscope::plugin::Syster Syster;

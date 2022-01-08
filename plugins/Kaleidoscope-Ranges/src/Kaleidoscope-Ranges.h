@@ -17,6 +17,11 @@
 
 #pragma once
 
+#include <stdint.h>  // for uint16_t
+
+// Included for definition of legacy Macros plugin key range:
+#include "kaleidoscope/key_defs.h"
+
 namespace kaleidoscope {
 namespace ranges {
 
@@ -24,13 +29,27 @@ namespace ranges {
 //
 // When adding, removing, or changing ranges, make sure that existing ranges are
 // never accidentally moved. If migrating keycodes that weren't previously using
-// the rang system, make sure you keep the old keycodes, even if they short
-// before ranges::FIRST, for the sake of remaining backwards compatible with
-// existing keymaps.
+// the range system, make sure you don't change the `Key` values. If an existing
+// `Key` value is changed, it won't be a problem for the Kaleidoscope sketch
+// itself, but it will cause problems for keymap entries stored in EEPROM
+// (i.e. Chrysalis keymap layers), which will not get updated by flashing the
+// firmware.
+//
+// When adding new `Key` values for plugins, to keep them backwards-compatible,
+// they must be added at the end of the range below (just before `SAFE_START`),
+// even if those values are logically related to existing ones. This is
+// important for compatibility with existing Chrysalis keymaps, despite the fact
+// that it makes the code more obtuse here.
+
+constexpr uint8_t MAX_CS_KEYS = 64;
+
 enum : uint16_t {
   // Macro ranges pre-date Kaleidoscope-Ranges, so they're coming before
   // ranges::FIRST, because we want to keep the keycodes backwards compatible.
-  MACRO_FIRST = 24576,
+  // This is undesirable, because it prevents us from making a clear distinction
+  // between plugin key values and core key values. The magic number
+  // `0b00100000` is the old `IS_MACRO` key flags bit.
+  MACRO_FIRST = (SYNTHETIC | 0b00100000) << 8,
   MACRO_LAST  = MACRO_FIRST + 255,
 
   FIRST       = 0xc000,
@@ -63,6 +82,11 @@ enum : uint16_t {
   TURBO,
   DYNAMIC_MACRO_FIRST,
   DYNAMIC_MACRO_LAST = DYNAMIC_MACRO_FIRST + 31,
+  OS_META_STICKY,
+  OS_ACTIVE_STICKY,
+  OS_CANCEL,
+  CS_FIRST,
+  CS_LAST  = CS_FIRST + MAX_CS_KEYS,
 
   SAFE_START,
   KALEIDOSCOPE_SAFE_START = SAFE_START
