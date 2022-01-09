@@ -22,16 +22,16 @@
 #endif
 
 #include "Kaleidoscope.h"
-#include "Kaleidoscope-EEPROM-Settings.h"
-#include "Kaleidoscope-EEPROM-Keymap.h"
+//#include "Kaleidoscope-EEPROM-Settings.h"
+//#include "Kaleidoscope-EEPROM-Keymap.h"
 #include "Kaleidoscope-FocusSerial.h"
 #include "Kaleidoscope-Chords.h"
 #include "Kaleidoscope-KeyTimings.h"
 #include "Kaleidoscope-Macros.h"
 #include "Kaleidoscope-MouseKeys.h"
 #include "Kaleidoscope-OneShot.h"
-#include "Kaleidoscope-Qukeys.h"
-#include "Kaleidoscope-SpaceCadet.h"
+//#include "Kaleidoscope-Qukeys.h"
+//#include "Kaleidoscope-SpaceCadet.h"
 
 
 
@@ -133,17 +133,15 @@ KEYMAPS(
 /* *INDENT-ON* */
 
 KALEIDOSCOPE_INIT_PLUGINS(
-  EEPROMSettings,
-  EEPROMKeymap,
+  //EEPROMSettings,
+  //EEPROMKeymap,
   Focus,
-  FocusEEPROMCommand,
-  FocusSettingsCommand,
-  Qukeys,
-  KeyTimings,
+  //FocusEEPROMCommand,
+  //FocusSettingsCommand,
+  //Qukeys,
+  //KeyTimings,
   Chords,
-  OneShot,
-  SpaceCadet,
-  OneShot,
+  //OneShot,
   Macros,
   MouseKeys
 );
@@ -174,8 +172,8 @@ const macro_t *macroAction(uint8_t macro_id, KeyEvent &event) {
 
 void setup() {
   Kaleidoscope.setup();
-  SpaceCadet.disable();
-  EEPROMKeymap.setup(10);
+  //SpaceCadet.disable();
+  //EEPROMKeymap.setup(10);
 }
 
 void loop() {

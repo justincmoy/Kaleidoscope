@@ -161,8 +161,12 @@ EventHandlerResult Chords::onFocusEvent(const char *command) {
   //return EventHandlerResult::EVENT_CONSUMED;
 }
 
-EventHandlerResult Chords::processChord(Chord &chord, ChordState &chordState, Key &mapped_key, KeyAddr key_addr, uint8_t key_state) {
+EventHandlerResult Chords::processChord(Chord &chord, ChordState &chordState, KeyEvent &event) {
+
+  Key mapped_key = event.key;
+  uint8_t key_state = event.state;
   uint32_t now = Runtime.millisAtCycleStart();
+
   bool ongoing = !keyToggledOn(key_state) && keyIsPressed(key_state);
   int8_t chordKeyIndex = -1;
   int i;
@@ -284,12 +288,15 @@ EventHandlerResult Chords::processChord(Chord &chord, ChordState &chordState, Ke
   return EventHandlerResult::OK;
 }
 
-EventHandlerResult Chords::onKeyswitchEvent(Key &mapped_key, KeyAddr key_addr, uint8_t key_state) {
+EventHandlerResult Chords::onKeyswitchEvent(KeyEvent &event) {
   EventHandlerResult ret = EventHandlerResult::OK;
 
+  if (event_tracker_.shouldIgnore(event))
+    return ret;
+
   for (int i = 0; i < nchords; i++)
-    if (processChord(chords[i], chordStates[i], mapped_key, key_addr, key_state) == EventHandlerResult::EVENT_CONSUMED)
-      ret = EventHandlerResult::EVENT_CONSUMED;
+    if (processChord(chords[i], chordStates[i], event) == EventHandlerResult::EVENT_CONSUMED)
+      ret = EventHandlerResult::ABORT;
 
   return ret;
 }

@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "kaleidoscope/KeyEventTracker.h"
 #include "kaleidoscope/Runtime.h"
 
 namespace kaleidoscope {
@@ -47,8 +48,8 @@ class Chords : public kaleidoscope::Plugin {
 
   EventHandlerResult onSetup();
   EventHandlerResult onFocusEvent(const char *command);
-  EventHandlerResult processChord(Chord &, ChordState &, Key &, KeyAddr, uint8_t);
-  EventHandlerResult onKeyswitchEvent(Key &, KeyAddr, uint8_t);
+  EventHandlerResult processChord(Chord &, ChordState &, KeyEvent &);
+  EventHandlerResult onKeyswitchEvent(KeyEvent &);
 
   /*static void setup(uint8_t max);
 
@@ -62,6 +63,7 @@ class Chords : public kaleidoscope::Plugin {
   static void updateKey(uint16_t base_pos, Key key);*/
 
  private:
+  KeyEventTracker event_tracker_;
 
   /*static uint16_t keymap_base_;
   static uint8_t max_layers_;
