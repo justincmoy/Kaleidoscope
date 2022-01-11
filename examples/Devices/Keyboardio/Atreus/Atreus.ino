@@ -25,10 +25,10 @@
 //#include "Kaleidoscope-EEPROM-Settings.h"
 //#include "Kaleidoscope-EEPROM-Keymap.h"
 #include "Kaleidoscope-FocusSerial.h"
-#include "Kaleidoscope-Chords.h"
+#include "Kaleidoscope-SimpleChords.h"
 #include "Kaleidoscope-KeyTimings.h"
 #include "Kaleidoscope-Macros.h"
-#include "Kaleidoscope-MouseKeys.h"
+//#include "Kaleidoscope-MouseKeys.h"
 #include "Kaleidoscope-OneShot.h"
 //#include "Kaleidoscope-Qukeys.h"
 //#include "Kaleidoscope-SpaceCadet.h"
@@ -140,10 +140,10 @@ KALEIDOSCOPE_INIT_PLUGINS(
   //FocusSettingsCommand,
   //Qukeys,
   //KeyTimings,
-  Chords,
+  SimpleChords,
   //OneShot,
-  Macros,
-  MouseKeys
+  Macros
+  //MouseKeys
 );
 
 const macro_t *macroAction(uint8_t macro_id, KeyEvent &event) {

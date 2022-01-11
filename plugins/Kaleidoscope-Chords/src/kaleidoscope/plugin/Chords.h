@@ -48,7 +48,7 @@ class Chords : public kaleidoscope::Plugin {
 
   EventHandlerResult onSetup();
   EventHandlerResult onFocusEvent(const char *command);
-  EventHandlerResult processChord(Chord &, ChordState &, KeyEvent &);
+  EventHandlerResult afterEachCycle();
   EventHandlerResult onKeyswitchEvent(KeyEvent &);
 
   /*static void setup(uint8_t max);
@@ -64,6 +64,22 @@ class Chords : public kaleidoscope::Plugin {
 
  private:
   KeyEventTracker event_tracker_;
+
+  typedef struct {
+    KeyEvent e;
+    char ref;
+  } queueItem;
+
+  queueItem queued_events_[10];
+  int nqueued_events_;
+  
+  typedef enum {
+    IGNORE,
+    CONSUME,
+    ACTIVATE
+  } KeyAction;
+
+  KeyAction processChord(Chord &, ChordState &, KeyEvent &);
 
   /*static uint16_t keymap_base_;
   static uint8_t max_layers_;
