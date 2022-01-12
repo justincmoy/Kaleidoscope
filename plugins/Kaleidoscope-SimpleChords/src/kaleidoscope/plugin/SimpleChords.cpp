@@ -91,7 +91,7 @@
 
 #include "Kaleidoscope-Macros.h"
 
-#define CHORD_TIMEOUT 24
+#define CHORD_TIMEOUT 1000
 #define QUEUE_LEN 10
 
 namespace kaleidoscope {
@@ -106,6 +106,14 @@ SimpleChords::Chord chords[] = {
     .length = 2,
     .keys = {Key_V, Key_F},
     .action = Key_Minus
+  }, {
+    .length = 2,
+    .keys = {Key_A, Key_S},
+    .action = Key_Q
+  }, {
+    .length = 3,
+    .keys = {Key_A, Key_S, Key_D},
+    .action = Key_W
   }/*, {
     .length = 2,
     .keys = {Key_Z, Key_X},
