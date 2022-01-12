@@ -23,15 +23,19 @@
  *
  * This is a simplified model in which all keys in the chord must be pressed not only within the timeout, but
  * also consecutively with no other keys in between.  (E.g., if "AS" is a chord, pressing "ADS" would not
- * activate the chord, regardless of timing).  (This is not *quite* true - if a subset of a chord is pressed,
- * and then releasing a key results in matching another chord, that will still match.  E.g., if AS and ASDF
- * are chords, pressing ADS and releasing D will match AS.  However, given expected timeouts, this case is
- * unlikely and likely harmless.)
+ * activate the chord, regardless of timing).  Further, events remain strictly ordered: if ASD is a chord, and
+ * AS is pressed and then S released, A-down, S-down, S-up would be sent.
  *
  * Further, as soon as a chord is detected, it is activated, and those keys cannot be used in other chords.
- * (For example, if AS, AD and ASD are all define chords, pressing ASD will trigger AS, consume them, and then
- * press D, while ADS would similarly trigger AD and then press S, while SDA will produce only ASD, since it
- * is the only chord to fully match at any point.
+ * (For example, if AS, AD and ASD are all defined chords, pressing ASD will trigger AS, consume them, and
+ * then press D, while ADS would similarly trigger AD and then press S, while SDA will produce only ASD, since
+ * it is the only chord to fully match at any point.
+ *
+ * A chord is considered "released" as soon as one of its keys is released; once released, the key will be
+ * processed as normal, but remaining keys held in the chord will be ignored until they are released.  (E.g.,
+ * if you press a chord ASD and release D, you can press D again to send a D, but the keyboard will act as
+ * though A and S are unpressed, and releasing them will have no impact, aside from allowing them to be
+ * pressed again.)
  *
  * So avoid overlapping chords that may be pressed simultaneously, though cases such as QA and AZ are likely
  * fine, as it's unlikely that both would be pressed simultaneously.
@@ -54,16 +58,16 @@
  *
  * So more precisely:
  *
- * - On a keypress, we logically add the key and its timestamp to the end of the queue, and check for cases:
+ * - On a keypress, we add the key and its timestamp to the end of the queue, and check for cases:
  *   - If the queue matches a chord, we send the chord and empty the queue.
  *   - If the queue is not a subset of any chord, remove the first key in the queue, send it, and repeat.
- * - On a keyrelease, we remove the key from the queue
+ * - On a keyrelease, we remove the key from the queue, along with any keys before it (to preserve ordering)
  *   - If the queue now matches a chord, we send the chord and empty the queue.
- *     (E.g., if ASDF is a chord, and so is AS, pressing ADS and then releasing D would trigger this.  This
- *     is a bit odd, but likely harmless and simplifies implementation.)
+ *     (E.g., if ASDF is a chord, and so is AS, pressing DAS and then releasing D would trigger this.  This
+ *     allows chords to be pressed immediately after another key, regardless of confounding chords.)
  *   - The queue was previously a subset of a chord, so it still is.
  * - If the first key in the queue times out, we treat it as if that key was released, sending it and checking
- *   the remainder of the queue for chords.
+ *   the remainder of the queue for chords (though not not sending a key release event).
  *
  *
  * Note that this is somewhat limiting - most cases are probably handled, but the TextBlade uses ZX, XC, and
@@ -98,11 +102,11 @@ SimpleChords::Chord chords[] = {
     .length = 2,
     .keys = {Key_F, Key_R},
     .action = Key_Tab
-  }, /*{
+  }, {
     .length = 2,
     .keys = {Key_V, Key_F},
     .action = Key_Minus
-  }, {
+  }/*, {
     .length = 2,
     .keys = {Key_Z, Key_X},
     .action = Key_LeftGui
@@ -162,7 +166,7 @@ EventHandlerResult SimpleChords::onSetup() {
 }
 
 void SimpleChords::expireEventAt(int index) {
-    ::Focus.send(F("Removing and sending queued key at index"), index, "\r\n");
+    ::Focus.send(F("Removing and sending queued key"), queued_events_[index].event.key, "at index", index, "\r\n");
     for (int i = index; i < nqueued_events_; i++)
       queued_events_[i] = queued_events_[i + 1];
     nqueued_events_--;
@@ -200,27 +204,45 @@ void SimpleChords::sendChord(int index) {
 
 void SimpleChords::checkChords() {
   int c, i, j;
+  bool partial_match;
   
-  ::Focus.send(F("Checking chords\r\n"));
-  for (c = 0; c < nchords; c++) {
-    // An exact match has to be the same length
-    if (chords[c].length != nqueued_events_)
-      continue;
-    for (i = 0; i < nqueued_events_; i++) {
-      for (j = 0; i < nqueued_events_; i++)
-        if(chords[c].keys[i] == queued_events_[j].event.key)
-          break;
-      // The key wasn't found in the queue; abort.
-      if (j == nqueued_events_)
-        break;
-    }
 
-    // No key wasn't found, so the queue matches!
-    if (i == nqueued_events_) {
-      sendChord(c);
-      clearQueue();
-      // Only one chord can match, so bail early.
-      return;
+  ::Focus.send(F("Checking chords\r\n"));
+  while (nqueued_events_ > 0) {
+    partial_match = false;
+    for (c = 0; c < nchords; c++) {
+      // A shorter chord can't match
+      if (chords[c].length < nqueued_events_)
+        continue;
+      for (i = 0; i < nqueued_events_; i++) {
+        for (j = 0; j < chords[c].length; j++)
+          if(queued_events_[i].event.key == chords[c].keys[j])
+            break;
+        // The key wasn't found in the queue; abort this chord.
+        if (j == chords[c].length)
+          break;
+      }
+
+      // No key wasn't found, so the queue is a subset of the chord!
+      if (i == nqueued_events_) {
+        ::Focus.send(F("Found a subset of chord"), c, "\r\n");
+        // if the queue is the length of the chord, we matched!  Send it!
+        if (chords[c].length == nqueued_events_) {
+          sendChord(c);
+          clearQueue();
+          // Only one chord can match, so bail early.
+          return;
+        } else {
+          partial_match = true;
+        }
+      }
+    }
+    if (!partial_match) {
+      ::Focus.send(F("No partial chords; expiring a character\r\n"));
+      expireEventAt(0);
+    } else {
+      ::Focus.send(F("partial match found; done checking chords\r\n"));
+      break;
     }
   }
 }
@@ -249,7 +271,6 @@ EventHandlerResult SimpleChords::onKeyswitchEvent(KeyEvent &event) {
     for (i = 0; i < nchords; i++) {
       for (j = 0; j < chords[i].length; j++)
         if (chords[i].keys[j] == event.key) {
-          ::Focus.send(F("Found key match at"), j, "\r\n");
           break;
         }
       // If new key is in the chord, break
@@ -260,7 +281,6 @@ EventHandlerResult SimpleChords::onKeyswitchEvent(KeyEvent &event) {
     }
 
     if(i != nchords) {
-      ::Focus.send(F("Found chord match again"), i, nchords, "\r\n");
       // The key is in a chord, so add it to the queue and check if we have a chord!
       queueEvent(event);
       checkChords();
