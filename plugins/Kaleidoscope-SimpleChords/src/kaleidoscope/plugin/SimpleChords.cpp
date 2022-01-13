@@ -167,6 +167,11 @@ typedef struct {
 
 queueItem queued_events_[QUEUE_LEN];
 
+int nconsumed_keys_;
+Key consumed_keys_[QUEUE_LEN];
+int nactive_chords;
+int active_chords_[QUEUE_LEN];
+
 EventHandlerResult SimpleChords::onSetup() {
   nqueued_events_ = 0;
 
@@ -208,6 +213,20 @@ void SimpleChords::replayQueue() {
 void SimpleChords::sendChord(int index) {
   ::Focus.send(F("Sending chord"), index, "\r\n");
   // TODO: send chord
+  for (int i = 0; i < chords[index].length; i++)
+    consumed_keys_[nconsumed_keys_++] = chords[index].keys[i];
+  active_chords_[nactive_chords++] = index;
+}
+
+void SimpleChords::releaseChord(int index) {
+  int i;
+
+  ::Focus.send(F("Releasing chord"), index, "\r\n");
+  // TODO: release chord
+  for (i = 0; i < nactive_chords && active_chords_[i] != index; i++);
+  nactive_chords--;
+  for (; i < nactive_chords; i++)
+    active_chords_[i] = active_chords_[i + 1];
 }
 
 void SimpleChords::checkChords() {
@@ -304,11 +323,32 @@ EventHandlerResult SimpleChords::onKeyswitchEvent(KeyEvent &event) {
       if (event.key == queued_events_[i].event.key)
         break;
 
-
     // If it's in the queue, send it.
+    // TODO: This should clear out the queue before it.
     if (i != nqueued_events_) {
       ::Focus.send(F("Sending queued event for released key"), queued_events_[i].event.key, "at index", i, "\r\n");
       expireEventAt(i);
+    }
+
+    for (i = 0; i < nconsumed_keys_; i++)
+      if (event.key == consumed_keys_[i])
+        break;
+    if (i != nconsumed_keys_) {
+      ::Focus.send(F("Eating consumed event for released key"), event.key, "at index", i, "\r\n");
+      nconsumed_keys_--;
+      for (; i < nconsumed_keys_; i++)
+        consumed_keys_[i] = consumed_keys_[i+1];
+
+      for (i = 0; i < nactive_chords; i++) {
+        int c = active_chords_[i];
+        for (j = 0; j < chords[c].length; j++)
+          if (event.key == chords[c].keys[j])
+            break;
+        if (j != chords[c].length)
+          releaseChord(c);
+      }
+
+      // TODO: ABORT The event
     }
     return EventHandlerResult::OK;
   }

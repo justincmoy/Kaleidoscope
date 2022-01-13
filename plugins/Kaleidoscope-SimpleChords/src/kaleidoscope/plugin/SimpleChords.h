@@ -46,6 +46,7 @@ class SimpleChords : public kaleidoscope::Plugin {
   void clearQueue();
   void replayQueue();
   void sendChord(int index);
+  void releaseChord(int index);
   void checkChords();
 };
 }
