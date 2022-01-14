@@ -94,6 +94,11 @@
 #define CHORD_TIMEOUT 100
 #define QUEUE_LEN 10
 
+#define DEBUG(...)
+//#define DEBUG(...) ::Focus.send(__VA_ARGS__);
+
+
+
 namespace kaleidoscope {
 namespace plugin {
 
@@ -188,7 +193,7 @@ EventHandlerResult SimpleChords::onSetup() {
 }
 
 void SimpleChords::expireEventAt(int index) {
-    ::Focus.send(F("Removing and sending queued key"), queued_events_[index].event.key, "at index", index, "\r\n");
+    DEBUG(F("Removing and sending queued key"), queued_events_[index].event.key, "at index", index, "\r\n");
     Runtime.handleKeyswitchEvent(queued_events_[index].event);
     for (int i = index; i < nqueued_events_; i++)
       queued_events_[i] = queued_events_[i + 1];
@@ -200,28 +205,28 @@ void SimpleChords::queueEvent(KeyEvent &event) {
     // TODO: Drop the first element from the queue instead of this one
     return;
   }
-  ::Focus.send(F("Queueing key"), event.key, "/", event.addr.row(), ",", event.addr.col(), "at index", nqueued_events_, "\r\n");
+  DEBUG(F("Queueing key"), event.key, "/", event.addr.row(), ",", event.addr.col(), "at index", nqueued_events_, "\r\n");
   queued_events_[nqueued_events_].event = event;
   queued_events_[nqueued_events_].time = Runtime.millisAtCycleStart();
   nqueued_events_++;
 }
 
 void SimpleChords::clearQueue() {
-  ::Focus.send(F("Clearing queuer\r\n"));
+  DEBUG(F("Clearing queuer\r\n"));
   nqueued_events_ = 0;
 }
 
 void SimpleChords::replayQueue() {
-  ::Focus.send(F("Replaying queue\r\n"));
+  DEBUG(F("Replaying queue\r\n"));
   for (int i = 0; i < nqueued_events_; i++) {
-    ::Focus.send(F("Sending queued event"), queued_events_[i].event.key, "at index", i, "\r\n");
+    DEBUG(F("Sending queued event"), queued_events_[i].event.key, "at index", i, "\r\n");
     Runtime.handleKeyswitchEvent(queued_events_[i].event);
   }
   clearQueue();
 }
 
 void SimpleChords::sendChord(int index) {
-  ::Focus.send(F("Sending chord"), index, "\r\n");
+  DEBUG(F("Sending chord"), index, "\r\n");
   // Arbitrarily pick the first event as the one to send with modified key
   queued_events_[0].event.key = chords[index].action;
   Runtime.handleKeyswitchEvent(queued_events_[0].event);
@@ -246,7 +251,7 @@ void SimpleChords::releaseChord(int active_index) {
   int i;
   KeyEvent event = KeyEvent(active_chords_[active_index].addr, WAS_PRESSED, chords[index].action);
 
-  ::Focus.send(F("Releasing chord"), index, "\r\n");
+  DEBUG(F("Releasing chord"), index, "\r\n");
   Runtime.handleKeyswitchEvent(event);
 
   for (i = 0; i < nactive_chords && active_chords_[i].index != index; i++);
@@ -260,7 +265,7 @@ void SimpleChords::checkChords() {
   bool partial_match;
   
 
-  ::Focus.send(F("Checking chords\r\n"));
+  DEBUG(F("Checking chords\r\n"));
   while (nqueued_events_ > 0) {
     partial_match = false;
     for (c = 0; c < nchords; c++) {
@@ -278,7 +283,7 @@ void SimpleChords::checkChords() {
 
       // No key wasn't found, so the queue is a subset of the chord!
       if (i == nqueued_events_) {
-        ::Focus.send(F("Found a subset of chord"), c, "\r\n");
+        DEBUG(F("Found a subset of chord"), c, "\r\n");
         // if the queue is the length of the chord, we matched!  Send it!
         if (chords[c].length == nqueued_events_) {
           sendChord(c);
@@ -291,10 +296,10 @@ void SimpleChords::checkChords() {
       }
     }
     if (!partial_match) {
-      ::Focus.send(F("No partial chords; expiring a character\r\n"));
+      DEBUG(F("No partial chords; expiring a character\r\n"));
       expireEventAt(0);
     } else {
-      ::Focus.send(F("partial match found; done checking chords\r\n"));
+      DEBUG(F("partial match found; done checking chords\r\n"));
       break;
     }
   }
@@ -302,7 +307,7 @@ void SimpleChords::checkChords() {
 
 EventHandlerResult SimpleChords::afterEachCycle() {
   while (nqueued_events_ > 0 && Runtime.hasTimeExpired(queued_events_[0].time, CHORD_TIMEOUT)) {
-    ::Focus.send(F("Removing expired event\r\n"));
+    DEBUG(F("Removing expired event\r\n"));
     expireEventAt(0);
     checkChords();
   }
@@ -328,7 +333,7 @@ EventHandlerResult SimpleChords::onKeyswitchEvent(KeyEvent &event) {
         }
       // If new key is in the chord, break
       if (j != chords[i].length) {
-        ::Focus.send(F("Found chord match at"), i, "\r\n");
+        DEBUG(F("Found chord match at"), i, "\r\n");
         break;
       }
     }
@@ -344,7 +349,7 @@ EventHandlerResult SimpleChords::onKeyswitchEvent(KeyEvent &event) {
       return EventHandlerResult::OK;
     }
   } else  {
-    ::Focus.send(F("Releasing key"), event.key, "/", event.addr.row(), ",", event.addr.col(), "\r\n");
+    DEBUG(F("Releasing key"), event.key, "/", event.addr.row(), ",", event.addr.col(), "\r\n");
     for (i = 0; i < nqueued_events_; i++)
       if (event.addr == queued_events_[i].event.addr)
         break;
@@ -352,21 +357,22 @@ EventHandlerResult SimpleChords::onKeyswitchEvent(KeyEvent &event) {
     // If it's in the queue, send it.
     // TODO: This should clear out the queue before it.
     if (i != nqueued_events_) {
-      ::Focus.send(F(" Sending queued event for released key"), queued_events_[i].event.key, "at index", i, "\r\n");
+      DEBUG(F(" Sending queued event for released key"), queued_events_[i].event.key, "at index", i, "\r\n");
       expireEventAt(i);
     }
 
-    if (nconsumed_keys_ > 0)
-      ::Focus.send(F(" Checking against "), nconsumed_keys_, "consumed keys\r\n");
+    if (nconsumed_keys_ > 0) {
+      DEBUG(F(" Checking against "), nconsumed_keys_, "consumed keys\r\n");
+    }
     for (i = 0; i < nconsumed_keys_; i++)
-      ::Focus.send(F("  Key: "), consumed_keys_[i].addr.row(), ",", consumed_keys_[i].addr.col(), "\r\n");
+      DEBUG(F("  Key: "), consumed_keys_[i].addr.row(), ",", consumed_keys_[i].addr.col(), "\r\n");
 
     for (k = 0; k < nconsumed_keys_; k++)
       if (event.addr == consumed_keys_[k].addr)
         break;
 
     if (k != nconsumed_keys_) {
-      ::Focus.send(F(" Eating consumed event for released key"), event.addr.row(), ",", event.addr.col(), "at index", i, "of", nconsumed_keys_, "\r\n");
+      DEBUG(F(" Eating consumed event for released key"), event.addr.row(), ",", event.addr.col(), "at index", i, "of", nconsumed_keys_, "\r\n");
       // Check if the chord this key was part of is still active.
       for (i = 0; i < nactive_chords; i++) {
         int c = active_chords_[i].index;
