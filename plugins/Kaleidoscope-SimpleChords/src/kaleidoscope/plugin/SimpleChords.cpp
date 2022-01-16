@@ -91,7 +91,7 @@
 
 #include "Kaleidoscope-Macros.h"
 
-#define CHORD_TIMEOUT 100
+#define CHORD_TIMEOUT 24
 #define QUEUE_LEN 10
 
 #define DEBUG(...)
