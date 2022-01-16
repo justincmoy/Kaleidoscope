@@ -132,6 +132,57 @@ KEYMAPS(
 )
 /* *INDENT-ON* */
 
+USE_SIMPLE_CHORDS(
+  {
+    .length = 2,
+    .keys = {Key_F, Key_R},
+    .action = Key_Tab
+  }, {
+    .length = 2,
+    .keys = {Key_V, Key_F},
+    .action = Key_Minus
+  }, {
+    .length = 2,
+    .keys = {Key_Z, Key_X},
+    .action = Key_LeftGui
+  }, {
+    .length = 2,
+    .keys = {Key_X, Key_C},
+    .action = Key_LeftAlt
+  }, {
+    .length = 2,
+    .keys = {Key_D, Key_C},
+    .action = Key_RightAlt
+  }, {
+    .length = 2,
+    .keys = {Key_C, Key_V},
+    .action = Key_LeftControl
+  }, {
+    .length = 2,
+    .keys = {Key_Slash, Key_Period},
+    .action = Key_LeftGui
+  }, {
+    .length = 2,
+    .keys = {Key_Period, Key_Comma},
+    .action = Key_LeftAlt
+  }, {
+    .length = 2,
+    .keys = {Key_Comma, Key_M},
+    .action = Key_LeftControl
+  }, {
+    .length = 2,
+    .keys = {Key_K, Key_Comma},
+    .action = Key_RightAlt
+  }, {
+    .length = 2,
+    .keys = {Key_J, Key_M},
+    .action = Key_Escape
+  }, {
+    .length = 2,
+    .keys = {Key_Backtick, Key_B},
+    .action = M(2)
+  })
+
 KALEIDOSCOPE_INIT_PLUGINS(
   //EEPROMSettings,
   //EEPROMKeymap,

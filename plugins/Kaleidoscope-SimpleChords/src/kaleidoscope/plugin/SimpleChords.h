@@ -20,6 +20,19 @@
 #include "kaleidoscope/KeyEventTracker.h"
 #include "kaleidoscope/Runtime.h"
 
+
+#define USE_SIMPLE_CHORDS(...)                                            \
+  namespace kaleidoscope {                                                \
+  namespace plugin {                                                      \
+  namespace simplechords {                                                \
+  const kaleidoscope::plugin::SimpleChords::Chord chords[]         =      \
+    {__VA_ARGS__};                                                        \
+                                                                          \
+  const uint8_t nchords = sizeof(chords) / sizeof(*chords);               \
+  }                                                                       \
+  }                                                                       \
+  }
+
 namespace kaleidoscope {
 namespace plugin {
 class SimpleChords : public kaleidoscope::Plugin {
@@ -49,6 +62,11 @@ class SimpleChords : public kaleidoscope::Plugin {
   void releaseChord(int index);
   void checkChords();
 };
+
+namespace simplechords {
+  extern const SimpleChords::Chord chords[];
+  extern const uint8_t nchords;
+}
 }
 }
 

@@ -57,6 +57,17 @@ KEYMAPS(
 );
 /* *INDENT-ON* */
 
+USE_SIMPLE_CHORDS(
+  {
+    .length = 2,
+    .keys = {Key_F, Key_R},
+    .action = Key_Equals
+  }, {
+    .length = 2,
+    .keys = {Key_V, Key_F},
+    .action = Key_Minus
+  })
+
 KALEIDOSCOPE_INIT_PLUGINS(Focus, GeminiPR, SimpleChords);
 
 void setup() {

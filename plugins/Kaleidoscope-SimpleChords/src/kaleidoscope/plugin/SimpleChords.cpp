@@ -102,67 +102,7 @@
 namespace kaleidoscope {
 namespace plugin {
 
-SimpleChords::Chord chords[] = {
-  {
-    .length = 2,
-    .keys = {Key_F, Key_R},
-    .action = Key_Equals
-  }, {
-    .length = 2,
-    .keys = {Key_V, Key_F},
-    .action = Key_Minus
-  }, {
-    .length = 2,
-    .keys = {Key_A, Key_S},
-    .action = Key_Q
-  }, {
-    .length = 3,
-    .keys = {Key_A, Key_S, Key_D},
-    .action = Key_W
-  }/*, {
-    .length = 2,
-    .keys = {Key_Z, Key_X},
-    .action = Key_LeftGui
-  }, {
-    .length = 2,
-    .keys = {Key_X, Key_C},
-    .action = Key_LeftAlt
-  }, {
-    .length = 2,
-    .keys = {Key_D, Key_C},
-    .action = Key_RightAlt
-  }, {
-    .length = 2,
-    .keys = {Key_C, Key_V},
-    .action = Key_LeftControl
-  }, {
-    .length = 2,
-    .keys = {Key_Slash, Key_Period},
-    .action = Key_LeftGui
-  }, {
-    .length = 2,
-    .keys = {Key_Period, Key_Comma},
-    .action = Key_LeftAlt
-  }, {
-    .length = 2,
-    .keys = {Key_Comma, Key_M},
-    .action = Key_LeftControl
-  }, {
-    .length = 2,
-    .keys = {Key_K, Key_Comma},
-    .action = Key_RightAlt
-  }, {
-    .length = 2,
-    .keys = {Key_J, Key_M},
-    .action = Key_Escape
-  }, {
-    .length = 2,
-    .keys = {Key_Backtick, Key_B},
-    .action = M(2)
-  }*/};
-
-
-const int nchords = sizeof(chords) / sizeof(chords[0]);
+using namespace simplechords;
 
 typedef struct {
   KeyEvent event;
@@ -395,5 +335,6 @@ EventHandlerResult SimpleChords::onKeyswitchEvent(KeyEvent &event) {
 
 }
 }
+
 
 kaleidoscope::plugin::SimpleChords SimpleChords;
