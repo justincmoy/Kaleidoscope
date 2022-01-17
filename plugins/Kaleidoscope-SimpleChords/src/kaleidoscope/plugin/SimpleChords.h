@@ -39,7 +39,7 @@ class SimpleChords : public kaleidoscope::Plugin {
  public:
   typedef struct {
     uint8_t length;
-    Key keys[5];
+    uint8_t keys[5]; // This should be a KeyAddr...
     Key action;
   } Chord;
 

@@ -135,51 +135,35 @@ KEYMAPS(
 USE_SIMPLE_CHORDS(
   {
     .length = 2,
-    .keys = {Key_F, Key_R},
+    .keys = {R1C3, R0C3},
     .action = Key_Tab
   }, {
     .length = 2,
-    .keys = {Key_V, Key_F},
+    .keys = {R2C3, R1C3},
     .action = Key_Minus
   }, {
     .length = 2,
-    .keys = {Key_Z, Key_X},
-    .action = Key_LeftGui
-  }, {
-    .length = 2,
-    .keys = {Key_X, Key_C},
-    .action = Key_LeftAlt
-  }, {
-    .length = 2,
-    .keys = {Key_D, Key_C},
-    .action = Key_RightAlt
-  }, {
-    .length = 2,
-    .keys = {Key_C, Key_V},
+    .keys = {R2C2, R2C3},
     .action = Key_LeftControl
   }, {
     .length = 2,
-    .keys = {Key_Slash, Key_Period},
-    .action = Key_LeftGui
-  }, {
-    .length = 2,
-    .keys = {Key_Period, Key_Comma},
-    .action = Key_LeftAlt
-  }, {
-    .length = 2,
-    .keys = {Key_Comma, Key_M},
+    .keys = {R2C8, R2C9},
     .action = Key_LeftControl
   }, {
     .length = 2,
-    .keys = {Key_K, Key_Comma},
+    .keys = {R1C2, R2C2},
     .action = Key_RightAlt
   }, {
     .length = 2,
-    .keys = {Key_J, Key_M},
+    .keys = {R1C9, R2C9},
+    .action = Key_RightAlt
+  }, {
+    .length = 2,
+    .keys = {R1C8, R2C8},
     .action = Key_Escape
   }, {
     .length = 2,
-    .keys = {Key_Backtick, Key_B},
+    .keys = {R2C4, R2C5},
     .action = M(2)
   })
 

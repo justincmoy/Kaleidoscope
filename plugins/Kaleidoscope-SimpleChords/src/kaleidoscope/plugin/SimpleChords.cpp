@@ -214,7 +214,7 @@ void SimpleChords::checkChords() {
         continue;
       for (i = 0; i < nqueued_events_; i++) {
         for (j = 0; j < chords[c].length; j++)
-          if(queued_events_[i].event.key == chords[c].keys[j])
+          if(queued_events_[i].event.addr.toInt() + 1 == chords[c].keys[j])
             break;
         // The key wasn't found in the queue; abort this chord.
         if (j == chords[c].length)
@@ -268,7 +268,7 @@ EventHandlerResult SimpleChords::onKeyswitchEvent(KeyEvent &event) {
     // Note: This could be combined with the checking for activated chords, but KISS.
     for (i = 0; i < nchords; i++) {
       for (j = 0; j < chords[i].length; j++)
-        if (chords[i].keys[j] == event.key) {
+        if (chords[i].keys[j] == event.addr.toInt() + 1) {
           break;
         }
       // If new key is in the chord, break

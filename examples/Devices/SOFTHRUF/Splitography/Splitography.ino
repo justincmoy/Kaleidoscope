@@ -60,11 +60,11 @@ KEYMAPS(
 USE_SIMPLE_CHORDS(
   {
     .length = 2,
-    .keys = {Key_F, Key_R},
+    .keys = {R1C4, R0C4},
     .action = Key_Equals
   }, {
     .length = 2,
-    .keys = {Key_V, Key_F},
+    .keys = {R1C4, R2C4},
     .action = Key_Minus
   })
 
