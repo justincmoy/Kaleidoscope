@@ -49,6 +49,8 @@ class SimpleChords : public kaleidoscope::Plugin {
   EventHandlerResult afterEachCycle();
   EventHandlerResult onKeyswitchEvent(KeyEvent &);
 
+  static int16_t timeout_;
+
  private:
   KeyEventTracker event_tracker_;
 

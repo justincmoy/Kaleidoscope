@@ -207,6 +207,7 @@ const macro_t *macroAction(uint8_t macro_id, KeyEvent &event) {
 
 void setup() {
   Kaleidoscope.setup();
+  //kaleidoscope::plugin::SimpleChords::timeout_ = 250;
   //SpaceCadet.disable();
   //EEPROMKeymap.setup(10);
 }

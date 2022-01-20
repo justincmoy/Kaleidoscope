@@ -91,7 +91,6 @@
 
 #include "Kaleidoscope-Macros.h"
 
-#define CHORD_TIMEOUT 24
 #define QUEUE_LEN 10
 
 #define DEBUG(...)
@@ -99,10 +98,14 @@
 
 
 
+
 namespace kaleidoscope {
 namespace plugin {
 
 using namespace simplechords;
+
+// Configuration
+int16_t SimpleChords::timeout_ = 24;
 
 typedef struct {
   KeyEvent event;
@@ -246,7 +249,7 @@ void SimpleChords::checkChords() {
 }
 
 EventHandlerResult SimpleChords::afterEachCycle() {
-  while (nqueued_events_ > 0 && Runtime.hasTimeExpired(queued_events_[0].time, CHORD_TIMEOUT)) {
+  while (nqueued_events_ > 0 && Runtime.hasTimeExpired(queued_events_[0].time, timeout_)) {
     DEBUG(F("Removing expired event\r\n"));
     expireEventAt(0);
     checkChords();
