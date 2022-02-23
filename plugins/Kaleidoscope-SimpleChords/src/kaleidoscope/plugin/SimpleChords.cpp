@@ -263,6 +263,8 @@ EventHandlerResult SimpleChords::onKeyswitchEvent(KeyEvent &event) {
 
   uint8_t i, j, k;
 
+  DEBUG("#### Get key addr", event.addr.toInt(), "vs first chord ", chords[0].keys[0], chords[0].keys[1], "\r\n", R0C0, R0C1, R0C2, R0C3, " - ", R1C0, R2C0, R3C0, R4C0);
+
   if (event_tracker_.shouldIgnore(event))
     return EventHandlerResult::OK;
 
