@@ -65,7 +65,7 @@ KEYMAPS(
 
     Key_PageUp,     Key_7,  Key_8, Key_9, Key_Backtick,  Key_Delete,
     Key_PageDown,   Key_4,  Key_5, Key_6, Key_Quote,     Key_Minus,
-    LSHIFT(Key_8),  Key_1,  Key_2, Key_3, Key_Backslash, Key_Equals,
+    Key_0,  Key_1,  Key_2, Key_3, Key_Backslash, Key_Equals,
     ___,            ___
   ),
 
