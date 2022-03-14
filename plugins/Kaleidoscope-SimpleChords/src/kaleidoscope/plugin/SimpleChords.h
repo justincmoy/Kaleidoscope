@@ -50,6 +50,7 @@ class SimpleChords : public kaleidoscope::Plugin {
   EventHandlerResult onKeyswitchEvent(KeyEvent &);
 
   static int16_t timeout_;
+  static int32_t ignoreOnLayers_;
 
  private:
   KeyEventTracker event_tracker_;

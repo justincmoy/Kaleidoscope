@@ -146,6 +146,7 @@ const macro_t *macroAction(uint8_t macro_id, KeyEvent &event) {
 }
 
 void setup() {
+  SimpleChords.ignoreOnLayers_ = 1 << _STENO;
   Kaleidoscope.serialPort().begin(9600);
   Kaleidoscope.setup();
 }
