@@ -22,22 +22,26 @@
 #endif
 
 #include "Kaleidoscope.h"
-#include "Kaleidoscope-EEPROM-Settings.h"
-#include "Kaleidoscope-EEPROM-Keymap.h"
+//#include "Kaleidoscope-EEPROM-Settings.h"
+//#include "Kaleidoscope-EEPROM-Keymap.h"
 #include "Kaleidoscope-FocusSerial.h"
+#include "Kaleidoscope-SimpleChords.h"
+#include "Kaleidoscope-KeyTimings.h"
 #include "Kaleidoscope-Macros.h"
-#include "Kaleidoscope-MouseKeys.h"
+//#include "Kaleidoscope-MouseKeys.h"
 #include "Kaleidoscope-OneShot.h"
-#include "Kaleidoscope-Qukeys.h"
-#include "Kaleidoscope-SpaceCadet.h"
+//#include "Kaleidoscope-Qukeys.h"
+//#include "Kaleidoscope-SpaceCadet.h"
 
 
 #define MO(n) ShiftToLayer(n)
 #define TG(n) LockLayer(n)
+#define UN(n) UnlockLayer(n)
 
 enum {
   MACRO_QWERTY,
-  MACRO_VERSION_INFO
+  MACRO_VERSION_INFO,
+  MACRO_ACCENT_GRAVE = 2
 };
 
 #define Key_Exclamation LSHIFT(Key_1)
@@ -51,57 +55,120 @@ enum {
 #define Key_Plus        LSHIFT(Key_Equals)
 
 enum {
+  NOLMTS,
   QWERTY,
   FUN,
-  UPPER
+  UPPER,
+  SHORTCUT
 };
 
 // clang-format off
 KEYMAPS(
+  [NOLMTS] = KEYMAP_STACKED
+  (
+       Key_Q   ,Key_W   ,Key_F       ,Key_R         ,Key_J
+      ,Key_A   ,Key_T   ,Key_H       ,Key_E         ,Key_G
+      ,Key_Z   ,Key_X   ,Key_D       ,Key_V         ,Key_B, Key_Backtick
+      ,Key_Escape ,Key_Tab ,Key_LeftGui ,MO(FUN) ,Key_Space ,Key_LeftAlt
+
+                     ,Key_Y     ,Key_U      ,Key_Semicolon     ,Key_L      ,Key_P
+                     ,Key_C     ,Key_S      ,Key_N     ,Key_O      ,Key_I
+       ,Key_Backslash,Key_K     ,Key_M      ,Key_Comma ,Key_Period ,Key_Slash
+       ,Key_LeftControl  ,Key_LeftShift    ,Key_Backspace ,Key_Minus ,Key_RightAlt  ,Key_Enter
+  ),
+
   [QWERTY] = KEYMAP_STACKED
   (
        Key_Q   ,Key_W   ,Key_E       ,Key_R         ,Key_T
       ,Key_A   ,Key_S   ,Key_D       ,Key_F         ,Key_G
       ,Key_Z   ,Key_X   ,Key_C       ,Key_V         ,Key_B, Key_Backtick
-      ,Key_Esc ,Key_Tab ,Key_LeftGui ,Key_LeftShift ,Key_Backspace ,Key_LeftControl
+      ,Key_Escape ,Key_Tab ,Key_LeftGui ,MO(FUN) ,Key_Space ,Key_LeftAlt
 
                      ,Key_Y     ,Key_U      ,Key_I     ,Key_O      ,Key_P
                      ,Key_H     ,Key_J      ,Key_K     ,Key_L      ,Key_Semicolon
        ,Key_Backslash,Key_N     ,Key_M      ,Key_Comma ,Key_Period ,Key_Slash
-       ,Key_LeftAlt  ,Key_Space ,MO(FUN)    ,Key_Minus ,Key_Quote  ,Key_Enter
+       ,Key_LeftControl  ,Key_LeftShift    ,Key_Backspace ,Key_Minus ,Key_RightAlt  ,Key_Enter
   ),
 
   [FUN] = KEYMAP_STACKED
   (
-       Key_Exclamation ,Key_At           ,Key_UpArrow   ,Key_Dollar           ,Key_Percent
+       Key_Exclamation ,Key_At           ,Key_UpArrow   ,Key_Home             ,Key_End
       ,Key_LeftParen   ,Key_LeftArrow    ,Key_DownArrow ,Key_RightArrow       ,Key_RightParen
       ,Key_LeftBracket ,Key_RightBracket ,Key_Hash      ,Key_LeftCurlyBracket ,Key_RightCurlyBracket ,Key_Caret
-      ,TG(UPPER)       ,Key_Insert       ,Key_LeftGui   ,Key_LeftShift        ,Key_Delete         ,Key_LeftControl
+      ,TG(UPPER)       ,Key_Insert       ,Key_LeftGui   ,MO(FUN)        ,Key_Space         ,Key_LeftAlt
 
                    ,Key_PageUp   ,Key_7 ,Key_8      ,Key_9 ,Key_Backspace
-                   ,Key_PageDown ,Key_4 ,Key_5      ,Key_6 ,___
+                   ,Key_PageDown ,Key_4 ,Key_5      ,Key_6 ,Key_Quote
       ,Key_And     ,Key_Star     ,Key_1 ,Key_2      ,Key_3 ,Key_Plus
-      ,Key_LeftAlt ,Key_Space    ,___   ,Key_Period ,Key_0 ,Key_Equals
+      ,Key_LeftControl  ,Key_LeftShift    ,Key_Delete ,Key_Period ,Key_0  ,Key_Equals
    ),
 
   [UPPER] = KEYMAP_STACKED
   (
        Key_Insert            ,Key_Home                 ,Key_UpArrow   ,Key_End        ,Key_PageUp
       ,Key_Delete            ,Key_LeftArrow            ,Key_DownArrow ,Key_RightArrow ,Key_PageDown
-      ,M(MACRO_VERSION_INFO) ,Consumer_VolumeIncrement ,XXX           ,XXX            ,___ ,___
-      ,MoveToLayer(QWERTY)   ,Consumer_VolumeDecrement ,___           ,___            ,___ ,___
+      ,M(MACRO_VERSION_INFO) ,Consumer_VolumeIncrement ,Consumer_Mute ,XXX            ,___ ,TG(SHORTCUT)
+      ,MoveToLayer(NOLMTS)   ,Consumer_VolumeDecrement ,___           ,MoveToLayer(QWERTY) ,___ ,___
 
                 ,Key_UpArrow   ,Key_F7              ,Key_F8          ,Key_F9         ,Key_F10
                 ,Key_DownArrow ,Key_F4              ,Key_F5          ,Key_F6         ,Key_F11
       ,___      ,XXX           ,Key_F1              ,Key_F2          ,Key_F3         ,Key_F12
-      ,___      ,___           ,MoveToLayer(QWERTY) ,Key_PrintScreen ,Key_ScrollLock ,Consumer_PlaySlashPause
+      ,___      ,___           ,___                 ,Key_PrintScreen ,Key_ScrollLock ,Consumer_PlaySlashPause
+   ),
+
+  [SHORTCUT] = KEYMAP_STACKED
+  (
+       ___ ,___ ,___ ,___ ,___
+      ,___ ,___ ,___ ,___ ,___
+      ,Key_Z ,Key_X ,___ ,___ ,Key_B ,UN(SHORTCUT)
+      ,___ ,___ ,___ ,___ ,___ ,___
+
+      ,Key_Z ,Key_X ,___ ,___ ,___
+      ,Key_H     ,Key_J      ,Key_K     ,Key_L      ,___
+      ,___ ,___ ,___ ,___ ,___ ,___
+      ,LCTRL(LSHIFT(Key_N)) ,Key_Space ,Key_B ,___ ,___ ,Key_Enter
    )
 )
 // clang-format on
 
+USE_SIMPLE_CHORDS(
+  {
+    .length = 2,
+    .keys = {R1C3, R0C3},
+    .action = Key_Tab
+  }, {
+    .length = 2,
+    .keys = {R2C3, R1C3},
+    .action = Key_Minus
+  }, {
+    .length = 2,
+    .keys = {R2C2, R2C3},
+    .action = Key_LeftControl
+  }, {
+    .length = 2,
+    .keys = {R2C8, R2C9},
+    .action = Key_LeftControl
+  }, {
+    .length = 2,
+    .keys = {R1C2, R2C2},
+    .action = Key_RightAlt
+  }, {
+    .length = 2,
+    .keys = {R1C9, R2C9},
+    .action = Key_RightAlt
+  }, {
+    .length = 2,
+    .keys = {R1C8, R2C8},
+    .action = Key_Escape
+  }, {
+    .length = 2,
+    .keys = {R2C4, R2C5},
+    .action = M(2)
+  })
+
 KALEIDOSCOPE_INIT_PLUGINS(
-  EEPROMSettings,
-  EEPROMKeymap,
+  //EEPROMSettings,
+  //EEPROMKeymap,
   Focus,
   FocusEEPROMCommand,
   FocusSettingsCommand,
@@ -125,6 +192,9 @@ const macro_t *macroAction(uint8_t macro_id, KeyEvent &event) {
       Macros.type(PSTR("Keyboardio Atreus - Kaleidoscope "));
       Macros.type(PSTR(BUILD_INFORMATION));
       break;
+    case MACRO_ACCENT_GRAVE:
+      return MACRO(I(50), D(RightAlt), T(Backtick), U(RightAlt));
+      break;
     default:
       break;
     }
@@ -134,8 +204,9 @@ const macro_t *macroAction(uint8_t macro_id, KeyEvent &event) {
 
 void setup() {
   Kaleidoscope.setup();
-  SpaceCadet.disable();
-  EEPROMKeymap.setup(10);
+  //kaleidoscope::plugin::SimpleChords::timeout_ = 250;
+  //SpaceCadet.disable();
+  //EEPROMKeymap.setup(10);
 }
 
 void loop() {
