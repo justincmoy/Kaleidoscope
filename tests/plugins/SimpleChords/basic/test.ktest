@@ -1,0 +1,21 @@
+VERSION 1
+
+KEYSWITCH MC0  0 0
+KEYSWITCH MC1  0 1
+KEYSWITCH MC2  0 2
+
+# ==============================================================================
+NAME SimpleChords key A
+
+PRESS MC0
+PRESS MC1
+PRESS MC2
+RUN 1 cycle
+
+EXPECT keyboard-report Key_B # The report should contain only `B`
+EXPECT keyboard-report empty # Report should be empty
+
+RELEASE MC2
+RELEASE MC1
+RELEASE MC0
+RUN 1 cycle

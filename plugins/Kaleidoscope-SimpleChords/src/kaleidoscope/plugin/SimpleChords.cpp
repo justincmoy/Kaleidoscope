@@ -175,7 +175,12 @@ void SimpleChords::sendChord(int index) {
   DEBUG(F("Sending chord"), index, "\r\n");
   // Arbitrarily pick the first event as the one to send with modified key
   queued_events_[0].event.key = chords[index].action;
-  Runtime.handleKeyswitchEvent(queued_events_[0].event);
+  // Runtime.handleKeyswitchEvent(queued_events_[0].event);
+
+  KeyAddr k{1, 0};
+  Runtime.handleKeyEvent(KeyEvent{k, IS_PRESSED | INJECTED, chords[index].action});
+  Runtime.handleKeyEvent(KeyEvent{k, WAS_PRESSED | INJECTED});
+
   // NOTE: if we're sending a chord, it's keys are the first <length> keys in the queue.
   for (int i = 0; i < chords[index].length; i++) {
     consumed_keys_[nconsumed_keys_].addr = queued_events_[i].event.addr;
