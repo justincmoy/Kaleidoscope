@@ -179,7 +179,6 @@ void SimpleChords::sendChord(int index) {
   k.key = chords[index].action;
   Runtime.handleKeyEvent(k);
 
-
   // NOTE: if we're sending a chord, it's keys are the first <length> keys in the queue.
   for (int i = 0; i < chords[index].length; i++) {
     consumed_keys_[nconsumed_keys_].addr = queued_events_[i].event.addr;
