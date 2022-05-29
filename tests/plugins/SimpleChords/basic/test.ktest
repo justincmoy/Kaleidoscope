@@ -40,3 +40,6 @@ RUN 1 cycle
 
 RELEASE MC2
 RUN 1 cycle
+
+EXPECT keyboard-report Key_2 # The report should contain only `2`
+EXPECT keyboard-report empty # Report should be empty
