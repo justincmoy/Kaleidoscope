@@ -112,7 +112,7 @@ int32_t SimpleChords::ignoreOnLayers_ = 0;
 
 typedef struct {
   KeyEvent event;
-  int time;
+  uint16_t time;
 } queueItem;
 
 queueItem queued_events_[QUEUE_LEN];
@@ -209,9 +209,10 @@ void SimpleChords::releaseChord(int active_index) {
     active_chords_[i] = active_chords_[i + 1];
 }
 
-void SimpleChords::checkChords() {
+bool SimpleChords::checkChords(bool sendSubset) {
   int c, i, j;
   bool partial_match;
+  int shouldSend = -1;
 
   DEBUG(F("Checking chords\r\n"));
   while (nqueued_events_ > 0) {
@@ -222,7 +223,7 @@ void SimpleChords::checkChords() {
         continue;
       for (i = 0; i < nqueued_events_; i++) {
         for (j = 0; j < chords[c].length; j++)
-          if(queued_events_[i].event.addr.toInt() + 1 == chords[c].keys[j])
+          if (queued_events_[i].event.addr.toInt() + 1 == chords[c].keys[j])
             break;
         // The key wasn't found in the queue; abort this chord.
         if (j == chords[c].length)
@@ -232,32 +233,47 @@ void SimpleChords::checkChords() {
       // No key wasn't found, so the queue is a subset of the chord!
       if (i == nqueued_events_) {
         DEBUG(F("Found a subset of chord"), c, "\r\n");
-        // if the queue is the length of the chord, we matched!  Send it!
+        // If the queue matches the chord, send it if we're supposed to. Otherwise, send it only after confirming it is not a subset of another chord.
         if (chords[c].length == nqueued_events_) {
-          sendChord(c);
-          clearQueue();
-          // Only one chord can match, so bail early.
-          return;
-        } else {
-          partial_match = true;
+          shouldSend = c;
+          if (sendSubset) {
+            break; // stop checking and send this chord.
+          }
         }
+
+        // Don't send anything if we have multiple partial matches.
+        if (!sendSubset && partial_match) {
+          return false;
+        }
+
+        partial_match = true;
       }
     }
+
+    if (shouldSend >= 0) {
+      sendChord(shouldSend);
+      clearQueue();
+      return true;
+    }
+
     if (!partial_match) {
       DEBUG(F("No partial chords; expiring a character\r\n"));
       expireEventAt(0);
     } else {
       DEBUG(F("partial match found; done checking chords\r\n"));
-      break;
+      return false;
     }
   }
+
+  return true;
 }
 
 EventHandlerResult SimpleChords::afterEachCycle() {
   while (nqueued_events_ > 0 && Runtime.hasTimeExpired(queued_events_[0].time, timeout_)) {
     DEBUG(F("Removing expired event\r\n"));
-    expireEventAt(0);
-    checkChords();
+    if (!checkChords(true)) {
+      expireEventAt(0);
+    }
   }
 
   return EventHandlerResult::OK;
@@ -298,7 +314,7 @@ EventHandlerResult SimpleChords::onKeyswitchEvent(KeyEvent &event) {
     if(i != nchords) {
       // The key is in a chord, so add it to the queue and check if we have a chord!
       queueEvent(event);
-      checkChords();
+      checkChords(false);
       return EventHandlerResult::ABORT;
     } else  {
       // The key is in not in a chord, so break the chord.

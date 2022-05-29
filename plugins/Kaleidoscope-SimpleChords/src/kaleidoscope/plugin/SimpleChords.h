@@ -63,7 +63,7 @@ class SimpleChords : public kaleidoscope::Plugin {
   void replayQueue();
   void sendChord(int index);
   void releaseChord(int index);
-  void checkChords();
+  bool checkChords(bool sendSubset);
 };
 
 namespace simplechords {
