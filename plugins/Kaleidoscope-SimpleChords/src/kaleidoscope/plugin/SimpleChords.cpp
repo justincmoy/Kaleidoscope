@@ -212,7 +212,6 @@ void SimpleChords::releaseChord(int active_index) {
 void SimpleChords::checkChords() {
   int c, i, j;
   bool partial_match;
-  
 
   DEBUG(F("Checking chords\r\n"));
   while (nqueued_events_ > 0) {
