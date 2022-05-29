@@ -13,9 +13,10 @@ PRESS MC2
 RUN 1 cycle
 
 EXPECT keyboard-report Key_B # The report should contain only `B`
-EXPECT keyboard-report empty # Report should be empty
 
 RELEASE MC2
 RELEASE MC1
 RELEASE MC0
 RUN 1 cycle
+
+EXPECT keyboard-report empty # Report should be empty
