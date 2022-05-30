@@ -141,10 +141,9 @@ EventHandlerResult SimpleChords::onSetup() {
 void SimpleChords::expireEventAt(int index) {
   DEBUG(F("Removing and sending queued key"), queued_events_[index].event.key, "at index", index, "\r\n");
 
-  Runtime.handleKeyswitchEvent(queued_events_[index].event);
-  // KeyEvent k = KeyEvent::next(queued_events_[index].event.addr, IS_PRESSED | INJECTED);
-  // k.key = queued_events_[index].event.key;
-  // Runtime.handleKeyEvent(k);
+  KeyEvent k = KeyEvent::next(queued_events_[index].event.addr, IS_PRESSED | INJECTED);
+  k.key = queued_events_[index].event.key;
+  Runtime.handleKeyEvent(k);
 
   for (int i = index; i < nqueued_events_; i++) {
     queued_events_[i] = queued_events_[i + 1];
