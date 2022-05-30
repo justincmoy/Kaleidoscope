@@ -3,6 +3,7 @@ VERSION 1
 KEYSWITCH MC0  0 0
 KEYSWITCH MC1  0 1
 KEYSWITCH MC2  0 2
+KEYSWITCH MC3  0 3
 
 # ==============================================================================
 NAME SimpleChords key superset
@@ -71,3 +72,21 @@ RELEASE MC1
 RUN 1 cycle
 EXPECT keyboard-report Key_1 # The report should contain only `1`
 EXPECT keyboard-report empty # Report should be empty
+
+# ==============================================================================
+NAME SimpleChords chord break
+
+PRESS MC0
+PRESS MC1
+RUN 1 cycle
+
+PRESS MC3
+RUN 1 cycle
+
+RELEASE MC3
+RELEASE MC1
+RELEASE MC0
+
+EXPECT keyboard-report Key_A # The report should contain only `A`
+EXPECT keyboard-report empty # Report should be empty
+EXPECT keyboard-report Key_3 # The report should contain only `3`

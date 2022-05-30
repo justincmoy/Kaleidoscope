@@ -168,17 +168,6 @@ void SimpleChords::clearQueue() {
   nqueued_events_ = 0;
 }
 
-void SimpleChords::replayQueue() {
-  DEBUG(F("Replaying queue\r\n"));
-  for (int i = 0; i < nqueued_events_; i++) {
-    DEBUG(F("Sending queued event"), queued_events_[i].event.key, "at index", i, "\r\n");
-    KeyEvent k = KeyEvent::next(queued_events_[i].event.addr, IS_PRESSED | INJECTED);
-    k.key = queued_events_[i].event.key;
-    Runtime.handleKeyEvent(k);
-  }
-  clearQueue();
-}
-
 void SimpleChords::sendChord(int index) {
   DEBUG(F("Sending chord"), index, "\r\n");
   // Arbitrarily pick the first event as the one to send with modified key
@@ -206,7 +195,6 @@ void SimpleChords::sendChord(int index) {
 void SimpleChords::releaseChord(int active_index) {
   int index = active_chords_[active_index].index;
   int i;
-  KeyEvent event = KeyEvent(active_chords_[active_index].addr, WAS_PRESSED, chords[index].action);
 
   DEBUG(F("Releasing chord"), index, "\r\n");
   KeyEvent k = KeyEvent::next(active_chords_[active_index].addr, WAS_PRESSED | INJECTED);
@@ -331,7 +319,17 @@ EventHandlerResult SimpleChords::onKeyswitchEvent(KeyEvent &event) {
     }
 
     // The key is not in a chord, so break the chord.
-    replayQueue();
+    checkChords(true);
+
+    DEBUG(F("Releasing active chords\r\n"));
+    while (nactive_chords > 0) {
+      releaseChord(0);
+    }
+
+    DEBUG(F("Replaying queue\r\n"));
+    while (nqueued_events_ > 0) {
+      expireEventAt(0);
+    }
     return EventHandlerResult::OK;
   }
 
