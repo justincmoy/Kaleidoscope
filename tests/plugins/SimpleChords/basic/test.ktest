@@ -5,7 +5,7 @@ KEYSWITCH MC1  0 1
 KEYSWITCH MC2  0 2
 
 # ==============================================================================
-NAME SimpleChords key B
+NAME SimpleChords key superset
 
 PRESS MC0
 PRESS MC1
@@ -22,7 +22,7 @@ RUN 1 cycle
 EXPECT keyboard-report empty # Report should be empty
 
 # ==============================================================================
-NAME SimpleChords key A timeout
+NAME SimpleChords chord timeout
 
 PRESS MC0
 PRESS MC1
@@ -42,4 +42,32 @@ RELEASE MC2
 RUN 1 cycle
 
 EXPECT keyboard-report Key_2 # The report should contain only `2`
+EXPECT keyboard-report empty # Report should be empty
+
+# ==============================================================================
+NAME SimpleChords fallback timeout
+
+PRESS MC0
+RUN 25 ms
+EXPECT keyboard-report Key_0 # The report should contain only `0`
+
+RELEASE MC0
+RUN 1 cycle
+EXPECT keyboard-report empty # Report should be empty
+
+# ==============================================================================
+NAME SimpleChords release key
+
+PRESS MC1
+PRESS MC2
+RUN 1 cycle
+
+RELEASE MC2
+RUN 1 cycle
+EXPECT keyboard-report Key_2 # The report should contain only `2`
+EXPECT keyboard-report empty # Report should be empty
+
+RELEASE MC1
+RUN 1 cycle
+EXPECT keyboard-report Key_1 # The report should contain only `1`
 EXPECT keyboard-report empty # Report should be empty
