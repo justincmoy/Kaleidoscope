@@ -15,6 +15,7 @@
  */
 
 #include <Kaleidoscope.h>
+#include <Kaleidoscope-OneShot.h>
 #include <Kaleidoscope-SimpleChords.h>
 
 #include "./common.h"
@@ -43,9 +44,10 @@ KEYMAPS(
 USE_SIMPLE_CHORDS(
   {.length = 2, .keys = {R0C0, R0C1}, .action = Key_A},
   {.length = 3, .keys = {R0C0, R0C1, R0C2}, .action = Key_B},
+  {.length = 2, .keys = {R1C0, R1C1}, .action = OSM(LeftShift)},
 );
 
-KALEIDOSCOPE_INIT_PLUGINS(SimpleChords);
+KALEIDOSCOPE_INIT_PLUGINS(SimpleChords, OneShot);
 
 void setup() {
   Kaleidoscope.setup();

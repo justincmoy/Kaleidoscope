@@ -4,6 +4,8 @@ KEYSWITCH MC0  0 0
 KEYSWITCH MC1  0 1
 KEYSWITCH MC2  0 2
 KEYSWITCH MC3  0 3
+KEYSWITCH MC10 1 0
+KEYSWITCH MC11 1 1
 
 # ==============================================================================
 NAME SimpleChords key superset
@@ -90,3 +92,24 @@ RELEASE MC0
 EXPECT keyboard-report Key_A # The report should contain only `A`
 EXPECT keyboard-report empty # Report should be empty
 EXPECT keyboard-report Key_3 # The report should contain only `3`
+
+# ==============================================================================
+NAME SimpleChords chord with OneShot next key
+
+PRESS MC10
+PRESS MC11
+RUN 1 cycle
+EXPECT keyboard-report empty # Report should be empty
+EXPECT keyboard-report Key_LeftShift # There report should contain `shift`
+RUN 5 ms
+RELEASE MC11
+RELEASE MC10
+RUN 10 ms
+PRESS MC0
+RUN 1 cycle
+RUN 5 ms
+RELEASE MC0
+RUN 1 cycle
+EXPECT keyboard-report Key_LeftShift Key_0 # There should be `shift`+`0`
+EXPECT keyboard-report Key_0 # There should be only `0`
+EXPECT keyboard-report empty # Report should be empty

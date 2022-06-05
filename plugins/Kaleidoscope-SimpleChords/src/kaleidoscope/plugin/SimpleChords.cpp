@@ -90,8 +90,6 @@
 #include "kaleidoscope/Runtime.h"
 #include "kaleidoscope/device/key_indexes.h"
 
-#include "Kaleidoscope-Macros.h"
-
 #define QUEUE_LEN 10
 
 #define DEBUG(...)
@@ -141,7 +139,7 @@ EventHandlerResult SimpleChords::onSetup() {
 void SimpleChords::expireEventAt(int index) {
   DEBUG(F("Removing and sending queued key"), queued_events_[index].event.key, "at index", index, "\r\n");
 
-  KeyEvent k = KeyEvent::next(queued_events_[index].event.addr, IS_PRESSED | INJECTED);
+  KeyEvent k = KeyEvent::next(queued_events_[index].event.addr, IS_PRESSED);
   k.key = queued_events_[index].event.key;
   Runtime.handleKeyEvent(k);
 
@@ -172,7 +170,7 @@ void SimpleChords::sendChord(int index) {
   DEBUG(F("Sending chord"), index, "\r\n");
   // Arbitrarily pick the first event as the one to send with modified key
   queued_events_[0].event.key = chords[index].action;
-  KeyEvent k = KeyEvent::next(queued_events_[0].event.addr, IS_PRESSED | INJECTED);
+  KeyEvent k = KeyEvent::next(queued_events_[0].event.addr, IS_PRESSED);
   k.key = chords[index].action;
   Runtime.handleKeyEvent(k);
 
@@ -197,7 +195,7 @@ void SimpleChords::releaseChord(int active_index) {
   int i;
 
   DEBUG(F("Releasing chord"), index, "\r\n");
-  KeyEvent k = KeyEvent::next(active_chords_[active_index].addr, WAS_PRESSED | INJECTED);
+  KeyEvent k = KeyEvent::next(active_chords_[active_index].addr, WAS_PRESSED);
   k.key = chords[index].action;
   Runtime.handleKeyEvent(k);
 
