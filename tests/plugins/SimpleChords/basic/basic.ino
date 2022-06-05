@@ -42,9 +42,9 @@ KEYMAPS(
 // *INDENT-ON*
 
 USE_SIMPLE_CHORDS(
-  {.length = 2, .keys = {KeyAddr(0, 0), KeyAddr(0, 1)}, .action = Key_A},
-  {.length = 3, .keys = {KeyAddr(0, 0), KeyAddr(0, 1), KeyAddr(0, 2)}, .action = Key_B},
-  {.length = 2, .keys = {KeyAddr(1, 0), KeyAddr(1, 1)}, .action = OSM(LeftShift)},
+  {.keys = {KeyAddr(0, 0), KeyAddr(0, 1)}, .action = Key_A},
+  {.keys = {KeyAddr(0, 0), KeyAddr(0, 1), KeyAddr(0, 2)}, .action = Key_B},
+  {.keys = {KeyAddr(1, 0), KeyAddr(1, 1)}, .action = OSM(LeftShift)},
 );
 
 KALEIDOSCOPE_INIT_PLUGINS(SimpleChords, OneShot);

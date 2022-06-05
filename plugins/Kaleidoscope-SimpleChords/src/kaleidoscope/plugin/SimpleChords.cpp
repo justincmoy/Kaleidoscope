@@ -174,8 +174,12 @@ void SimpleChords::sendChord(int index) {
   Runtime.handleKeyEvent(k);
 
   // NOTE: if we're sending a chord, it's keys are the first <length> keys in the queue.
-  for (int i = 0; i < chords[index].length; i++) {
-    consumed_keys_[nconsumed_keys_].addr = queued_events_[i].event.addr;
+  int chord_length;
+  for (chord_length = 0; chord_length < MAX_CHORD_LENGTH; chord_length++) {
+    if (!chords[index].keys[chord_length].isValid()) {
+      break;
+    }
+    consumed_keys_[nconsumed_keys_].addr = queued_events_[chord_length].event.addr;
     consumed_keys_[nconsumed_keys_].chord = index;
     nconsumed_keys_++;
   }
@@ -184,9 +188,10 @@ void SimpleChords::sendChord(int index) {
   nactive_chords++;
 
   // Remove the chord events from the queue.
-  nqueued_events_ -= chords[index].length;
-  for (int i = 0; i < nqueued_events_; i++)
-    queued_events_[i] = queued_events_[i + chords[index].length];
+  nqueued_events_ -= chord_length;
+  for (int i = 0; i < nqueued_events_; i++) {
+    queued_events_[i] = queued_events_[i + chord_length];
+  }
 }
 
 void SimpleChords::releaseChord(int active_index) {
@@ -205,7 +210,7 @@ void SimpleChords::releaseChord(int active_index) {
 }
 
 bool SimpleChords::checkChords(bool sendSubset) {
-  int c, i, j;
+  int c, i;
   bool partial_match;
   int shouldSend = -1;
 
@@ -213,25 +218,38 @@ bool SimpleChords::checkChords(bool sendSubset) {
   while (nqueued_events_ > 0) {
     partial_match = false;
     for (c = 0; c < nchords; c++) {
+      int chord_length;
+      for (chord_length = 0; chord_length < MAX_CHORD_LENGTH; chord_length++) {
+        if (!chords[c].keys[chord_length].isValid()) {
+          break;
+        }
+      }
       // A shorter chord can't match
-      if (chords[c].length < nqueued_events_)
+      if (chord_length < nqueued_events_) {
         continue;
+      }
+
       for (i = 0; i < nqueued_events_; i++) {
-        for (j = 0; j < chords[c].length; j++) {
-          if (queued_events_[i].event.addr == chords[c].keys[j])
+        bool match_found;
+
+        for (uint8_t j = 0; j < MAX_CHORD_LENGTH; j++) {
+          if (queued_events_[i].event.addr == chords[c].keys[j]) {
+            match_found = true;
             break;
+          }
         }
 
         // The key wasn't found in the queue; abort this chord.
-        if (j == chords[c].length)
+        if (!match_found) {
           break;
+        }
       }
 
-      // No key wasn't found, so the queue is a subset of the chord!
+      // All keys were found, so the queue is a subset of the chord!
       if (i == nqueued_events_) {
         DEBUG(F("Found a subset of chord"), c, "\r\n");
         // If the queue matches the chord, send it if we're supposed to. Otherwise, send it only after confirming it is not a subset of another chord.
-        if (chords[c].length == nqueued_events_) {
+        if (chord_length == nqueued_events_) {
           shouldSend = c;
           if (sendSubset) {
             break; // stop checking and send this chord.
@@ -277,7 +295,7 @@ EventHandlerResult SimpleChords::afterEachCycle() {
 }
 
 EventHandlerResult SimpleChords::onKeyswitchEvent(KeyEvent &event) {
-  uint8_t i, j, k;
+  uint8_t i, k;
 
   int32_t layers = ignoreOnLayers_;
   for (i = 0; layers; i++) {
@@ -293,14 +311,20 @@ EventHandlerResult SimpleChords::onKeyswitchEvent(KeyEvent &event) {
     // Check if the key is in any chords
     // Note: This could be combined with the checking for activated chords, but KISS.
     for (i = 0; i < nchords; i++) {
-      for (j = 0; j < chords[i].length; j++) {
+      bool match_found;
+      for (uint8_t j = 0; j < MAX_CHORD_LENGTH; j++) {
+        if (!chords[i].keys[j].isValid()) {
+          break;
+        }
+
         if (chords[i].keys[j] == event.addr) {
+          match_found = true;
           break;
         }
       }
 
       // If new key is in the chord, break
-      if (j != chords[i].length) {
+      if (match_found) {
         DEBUG(F("Found chord match at"), i, "\r\n");
         break;
       }

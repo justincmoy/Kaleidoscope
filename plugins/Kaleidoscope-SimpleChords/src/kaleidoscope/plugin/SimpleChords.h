@@ -33,13 +33,14 @@
   }                                                                       \
   }
 
+#define MAX_CHORD_LENGTH 5
+
 namespace kaleidoscope {
 namespace plugin {
 class SimpleChords : public kaleidoscope::Plugin {
  public:
   typedef struct {
-    uint8_t length;
-    KeyAddr keys[5];
+    KeyAddr keys[MAX_CHORD_LENGTH];
     Key action;
   } Chord;
 
