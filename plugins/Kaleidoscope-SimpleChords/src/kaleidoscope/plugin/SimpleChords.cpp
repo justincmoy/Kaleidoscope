@@ -218,7 +218,7 @@ bool SimpleChords::checkChords(bool sendSubset) {
         continue;
       for (i = 0; i < nqueued_events_; i++) {
         for (j = 0; j < chords[c].length; j++) {
-          if (queued_events_[i].event.addr.toInt() + 1 == chords[c].keys[j])
+          if (queued_events_[i].event.addr == chords[c].keys[j])
             break;
         }
 
@@ -279,8 +279,6 @@ EventHandlerResult SimpleChords::afterEachCycle() {
 EventHandlerResult SimpleChords::onKeyswitchEvent(KeyEvent &event) {
   uint8_t i, j, k;
 
-  DEBUG("#### Get key addr", event.addr.toInt(), "vs first chord ", chords[0].keys[0], chords[0].keys[1], "\r\n", R0C0, R0C1, R0C2, R0C3, " - ", R1C0, R2C0, R3C0, R4C0);
-
   int32_t layers = ignoreOnLayers_;
   for (i = 0; layers; i++) {
     if (layers & 1 && Layer.isActive(i))
@@ -296,7 +294,7 @@ EventHandlerResult SimpleChords::onKeyswitchEvent(KeyEvent &event) {
     // Note: This could be combined with the checking for activated chords, but KISS.
     for (i = 0; i < nchords; i++) {
       for (j = 0; j < chords[i].length; j++) {
-        if (chords[i].keys[j] == event.addr.toInt() + 1) {
+        if (chords[i].keys[j] == event.addr) {
           break;
         }
       }
