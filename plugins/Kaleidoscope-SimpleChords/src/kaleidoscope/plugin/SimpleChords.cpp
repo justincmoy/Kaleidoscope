@@ -168,8 +168,8 @@ void SimpleChords::clearQueue() {
 
 void SimpleChords::sendChord(int index) {
   DEBUG(F("Sending chord"), index, "\r\n");
-  // Arbitrarily pick the first event as the one to send with modified key
-  KeyEvent k = KeyEvent::next(queued_events_[0].event.addr, IS_PRESSED);
+  // Arbitrarily pick the first listed keyaddr as the one to send with modified key.
+  KeyEvent k = KeyEvent::next(chords[index].keys[0], IS_PRESSED);
   k.key = chords[index].action;
   Runtime.handleKeyEvent(k);
 
