@@ -210,7 +210,7 @@ void SimpleChords::releaseChord(int active_index) {
 }
 
 bool SimpleChords::checkChords(bool sendSubset) {
-  int c, i;
+  int c, i, j;
   bool partial_match;
   int shouldSend = -1;
 
@@ -230,17 +230,14 @@ bool SimpleChords::checkChords(bool sendSubset) {
       }
 
       for (i = 0; i < nqueued_events_; i++) {
-        bool match_found;
-
-        for (uint8_t j = 0; j < MAX_CHORD_LENGTH; j++) {
+        for (j = 0; j < chord_length; j++) {
           if (queued_events_[i].event.addr == chords[c].keys[j]) {
-            match_found = true;
             break;
           }
         }
 
         // The key wasn't found in the queue; abort this chord.
-        if (!match_found) {
+        if (j == chord_length) {
           break;
         }
       }
