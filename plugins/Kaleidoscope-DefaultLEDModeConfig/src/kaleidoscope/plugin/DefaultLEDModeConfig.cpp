@@ -1,7 +1,6 @@
 /* -*- mode: c++ -*-
- * kaleidoscope::plugin::PersistentLEDMode -- Persist the current LED mode to Storage
- * Copyright (C) 2019-2022  Keyboard.io, Inc.
- * Copyright (C) 2019  Dygma, Inc.
+ * Kaleidoscope - Firmware for computer input devices
+ * Copyright (C) 2022  Keyboard.io, Inc.
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,7 +15,7 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "kaleidoscope/plugin/PersistentLEDMode.h"
+#include "kaleidoscope/plugin/DefaultLEDModeConfig.h"
 
 #include <Arduino.h>                       // for PSTR, strcmp_P, F, __FlashStringHelper
 #include <Kaleidoscope-EEPROM-Settings.h>  // for EEPROMSettings
@@ -31,10 +30,10 @@
 namespace kaleidoscope {
 namespace plugin {
 
-uint16_t PersistentLEDMode::settings_base_;
-struct PersistentLEDMode::settings PersistentLEDMode::settings_;
+uint16_t DefaultLEDModeConfig::settings_base_;
+struct DefaultLEDModeConfig::settings DefaultLEDModeConfig::settings_;
 
-EventHandlerResult PersistentLEDMode::onSetup() {
+EventHandlerResult DefaultLEDModeConfig::onSetup() {
   settings_base_ = ::EEPROMSettings.requestSlice(sizeof(settings_));
 
   Runtime.storage().get(settings_base_, settings_);
@@ -49,22 +48,42 @@ EventHandlerResult PersistentLEDMode::onSetup() {
   return EventHandlerResult::OK;
 }
 
-EventHandlerResult PersistentLEDMode::onLEDModeChange() {
-  if (settings_.default_mode_index == ::LEDControl.get_mode_index())
+EventHandlerResult DefaultLEDModeConfig::onFocusEvent(const char *command) {
+  const char *cmd = PSTR("led_mode.default");
+
+  if (::Focus.handleHelp(command, cmd))
     return EventHandlerResult::OK;
 
-  settings_.default_mode_index = ::LEDControl.get_mode_index();
-  Runtime.storage().put(settings_base_, settings_);
-  Runtime.storage().commit();
+  if (strcmp_P(command, cmd) != 0)
+    return EventHandlerResult::OK;
 
-  return EventHandlerResult::OK;
+  if (::Focus.isEOL()) {
+    ::Focus.send(settings_.default_mode_index);
+  } else {
+    uint8_t idx;
+    ::Focus.read(idx);
+    settings_.default_mode_index = idx;
+
+    ::LEDControl.set_mode(idx);
+    Runtime.storage().put(settings_base_, settings_);
+    Runtime.storage().commit();
+  }
+
+  return EventHandlerResult::EVENT_CONSUMED;
 }
 
-EventHandlerResult PersistentLEDMode::onNameQuery() {
-  return ::Focus.sendName(F("PersistentLEDMode"));
+EventHandlerResult DefaultLEDModeConfig::onNameQuery() {
+  return ::Focus.sendName(F("DefaultLEDModeConfig"));
+}
+
+void DefaultLEDModeConfig::activateLEDModeIfUnconfigured(LEDModeInterface *plugin) {
+  if (!Runtime.storage().isSliceUninitialized(settings_base_, sizeof(settings_)))
+    return;
+
+  plugin->activate();
 }
 
 }  // namespace plugin
 }  // namespace kaleidoscope
 
-kaleidoscope::plugin::PersistentLEDMode PersistentLEDMode;
+kaleidoscope::plugin::DefaultLEDModeConfig DefaultLEDModeConfig;
