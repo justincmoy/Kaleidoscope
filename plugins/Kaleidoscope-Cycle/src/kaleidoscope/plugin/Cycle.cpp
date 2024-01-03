@@ -75,14 +75,40 @@ EventHandlerResult Cycle::onKeyEvent(KeyEvent &event) {
     return EventHandlerResult::OK;
   }
 
+  cycle_key_addr_ = event.addr;
+
+  if (keyToggledOn(event.state)) {
+    start_time_ = Runtime.millisAtCycleStart();
+    timer_running_ = true;
+    qukeys_needs_sending_ = true;
+    return EventHandlerResult::EVENT_CONSUMED;
+  }
+
   if (!keyToggledOff(event.state)) {
     return EventHandlerResult::EVENT_CONSUMED;
   }
 
-  ++cycle_count_;
-  cycle_key_addr_ = event.addr;
-  cycleAction(last_non_cycle_key_, cycle_count_);
+  if (timer_running_ && Runtime.hasTimeExpired(start_time_, hold_timeout_)) {
+    KeyEvent qukeys_event{event.addr, WAS_PRESSED, Key_LShift, event.id()};
+    Runtime.handleKeyswitchEvent(qukeys_event);
+  } else {
+    ++cycle_count_;
+    cycleAction(last_non_cycle_key_, cycle_count_);
+  }
+
+  timer_running_ = false;
+  qukeys_needs_sending_ = false;
   return EventHandlerResult::EVENT_CONSUMED;
+}
+
+EventHandlerResult Cycle::onKeyswitchEvent(KeyEvent &event) {
+  if (qukeys_needs_sending_ && timer_running_ && Runtime.hasTimeExpired(start_time_, hold_timeout_)) {
+    KeyEvent qukeys_event{cycle_key_addr_, IS_PRESSED, Key_LShift, event.id()};
+    qukeys_needs_sending_ = false;
+    Runtime.handleKeyswitchEvent(qukeys_event);
+  }
+
+  return EventHandlerResult::OK;
 }
 
 uint8_t Cycle::toModFlag(uint8_t keyCode) {

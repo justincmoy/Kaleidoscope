@@ -70,3 +70,25 @@ PRESS CYCLE
 EXPECT keyboard-report empty # Report should be empty
 RUN 1 cycle
 RELEASE CYCLE
+
+NAME Cycle qukeys
+RUN 5 ms
+PRESS A
+RUN 1 cycle
+EXPECT keyboard-report Key_A # Report should contain A
+RUN 1 cycle
+RELEASE A
+RUN 1 cycle
+PRESS CYCLE
+EXPECT keyboard-report empty # Report should be empty
+RUN 250ms
+PRESS C
+RUN 1 cycle
+EXPECT keyboard-report Key_LeftShift # report: { e1 }
+EXPECT keyboard-report Key_LeftShift Key_C # report: { 6 e1 }
+RELEASE C
+RUN 1 cycle
+RELEASE CYCLE
+EXPECT keyboard-report Key_LeftShift # report
+RUN 1 cycle
+EXPECT keyboard-report empty

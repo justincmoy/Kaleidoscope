@@ -43,6 +43,7 @@ class Cycle : public kaleidoscope::Plugin {
 
   EventHandlerResult onNameQuery();
   EventHandlerResult onKeyEvent(KeyEvent &event);
+  EventHandlerResult onKeyswitchEvent(KeyEvent &event);
 
  private:
   uint8_t toModFlag(uint8_t keyCode);
@@ -50,6 +51,10 @@ class Cycle : public kaleidoscope::Plugin {
   KeyAddr cycle_key_addr_{KeyAddr::invalid_state};
   uint8_t cycle_count_;
   uint8_t current_modifier_flags_;
+  uint16_t hold_timeout_{250};
+  uint8_t start_time_{0};
+  bool timer_running_{false};
+  bool qukeys_needs_sending_{false};
 };
 
 }  // namespace plugin
