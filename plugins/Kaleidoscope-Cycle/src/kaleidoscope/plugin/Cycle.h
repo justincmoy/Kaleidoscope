@@ -43,7 +43,7 @@ class Cycle : public kaleidoscope::Plugin {
 
   EventHandlerResult onNameQuery();
   EventHandlerResult onKeyEvent(KeyEvent &event);
-  EventHandlerResult onKeyswitchEvent(KeyEvent &event);
+  EventHandlerResult beforeEachCycle();
 
  private:
   uint8_t toModFlag(uint8_t keyCode);
