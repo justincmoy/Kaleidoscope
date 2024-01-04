@@ -55,6 +55,7 @@ class Cycle : public kaleidoscope::Plugin {
   uint8_t start_time_{0};
   bool timer_running_{false};
   bool qukeys_needs_sending_{false};
+  Key qukey_key_{Key_LShift};
 };
 
 }  // namespace plugin

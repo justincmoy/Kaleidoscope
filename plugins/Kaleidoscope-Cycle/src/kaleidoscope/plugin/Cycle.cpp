@@ -89,8 +89,7 @@ EventHandlerResult Cycle::onKeyEvent(KeyEvent &event) {
   }
 
   if (timer_running_ && Runtime.hasTimeExpired(start_time_, hold_timeout_)) {
-    KeyEvent qukeys_event{event.addr, WAS_PRESSED, Key_LShift};
-    Runtime.handleKeyswitchEvent(qukeys_event);
+    Runtime.handleKeyEvent(KeyEvent{event.addr, WAS_PRESSED | INJECTED, qukey_key_});
   } else {
     ++cycle_count_;
     cycleAction(last_non_cycle_key_, cycle_count_);
@@ -103,9 +102,8 @@ EventHandlerResult Cycle::onKeyEvent(KeyEvent &event) {
 
 EventHandlerResult Cycle::beforeEachCycle() {
   if (qukeys_needs_sending_ && timer_running_ && Runtime.hasTimeExpired(start_time_, hold_timeout_)) {
-    KeyEvent qukeys_event{cycle_key_addr_, IS_PRESSED, Key_LShift};
     qukeys_needs_sending_ = false;
-    Runtime.handleKeyswitchEvent(qukeys_event);
+    Runtime.handleKeyswitchEvent(KeyEvent{cycle_key_addr_, IS_PRESSED | INJECTED, qukey_key_});
   }
 
   return EventHandlerResult::OK;
