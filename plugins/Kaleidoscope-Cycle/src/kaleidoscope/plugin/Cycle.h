@@ -45,6 +45,11 @@ class Cycle : public kaleidoscope::Plugin {
   EventHandlerResult onKeyEvent(KeyEvent &event);
   EventHandlerResult beforeEachCycle();
 
+  /// Sets the hold time required to trigger Qukey (in ms)
+  void setTimeout(uint16_t new_timeout) {
+    hold_timeout_ = new_timeout;
+  }
+
  private:
   uint8_t toModFlag(uint8_t keyCode);
   Key last_non_cycle_key_;
